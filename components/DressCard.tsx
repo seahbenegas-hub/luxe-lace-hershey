@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Dress } from "@/types";
 import { formatPrice } from "@/lib/utils";
-import { Calendar, Palette, Ruler } from "lucide-react";
+import { Calendar, Palette, Ruler, X } from "lucide-react";
 
 interface DressCardProps {
   dress: Dress;
@@ -75,6 +75,19 @@ export default function DressCard({ dress }: DressCardProps) {
     setPan({ x: 0, y: 0 });
     setZoom(1);
   }, [dress.id, dress.image, dress.images]);
+
+  useEffect(() => {
+    const handleEscKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isPreviewOpen) {
+        setIsPreviewOpen(false);
+      }
+    };
+
+    if (isPreviewOpen) {
+      document.addEventListener("keydown", handleEscKey);
+      return () => document.removeEventListener("keydown", handleEscKey);
+    }
+  }, [isPreviewOpen]);
 
   return (
     <div className="group bg-white rounded-2xl border border-secondary-200 overflow-hidden hover:shadow-xl transition-all duration-300">
@@ -159,9 +172,10 @@ export default function DressCard({ dress }: DressCardProps) {
             <button
               type="button"
               onClick={() => setIsPreviewOpen(false)}
-              className="absolute -top-11 right-0 rounded-full bg-white/10 px-3 py-1 text-sm text-white hover:bg-white/20"
+              className="absolute top-3 right-3 rounded-full bg-secondary-100 p-2 text-secondary-800 hover:bg-secondary-200 transition-colors"
+              aria-label="Close preview"
             >
-              Close
+              <X className="w-5 h-5" />
             </button>
 
             <div className="relative overflow-hidden rounded-xl bg-secondary-100">
