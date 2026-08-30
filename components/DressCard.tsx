@@ -18,8 +18,8 @@ export default function DressCard({ dress }: DressCardProps) {
           src={dress.image}
           alt={dress.name}
           fill
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute top-3 right-3">
           <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-semibold text-secondary-800">

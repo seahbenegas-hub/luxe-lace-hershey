@@ -12,7 +12,8 @@ export default function HomePage() {
             src="https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=1920&auto=format&fit=crop"
             alt="Hero background"
             fill
-            className="object-cover"
+            sizes="100vw"
+            className="h-full w-full object-cover object-center"
             priority
           />
         </div>
@@ -112,7 +113,8 @@ export default function HomePage() {
                   src={dress.image}
                   alt={dress.name}
                   fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                  className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                 />
                 <span className="absolute top-3 right-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-semibold">
                   {dress.category}
