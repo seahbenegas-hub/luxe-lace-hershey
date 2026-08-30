@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { clientKey, rateLimit } from "@/lib/security";
 
 const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY)
@@ -7,7 +8,11 @@ const stripe = process.env.STRIPE_SECRET_KEY
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    if (!rateLimit(`payment:${clientKey(request)}`, 20)) {
+      return NextResponse.json({ error: "Too many payment attempts" }, { status: 429 });
+    }
+
+    const body = await request.json().catch(() => null);
     const amount = Number(body?.amount ?? 0);
 
     if (!amount || amount <= 0) {
@@ -15,13 +20,11 @@ export async function POST(request: Request) {
     }
 
     if (!stripe) {
-      return NextResponse.json({
-        success: true,
-        transactionId: `demo_${Math.random().toString(36).slice(2, 12)}`,
-        status: "paid",
-        amount,
-        mode: "demo",
-      });
+      return NextResponse.json({ error: "Payment is not configured" }, { status: 503 });
+    }
+
+    if (body.currency && !["php", "usd"].includes(String(body.currency).toLowerCase())) {
+      return NextResponse.json({ error: "Unsupported currency" }, { status: 400 });
     }
 
     const paymentIntent = await stripe.paymentIntents.create({

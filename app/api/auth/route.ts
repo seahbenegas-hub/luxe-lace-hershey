@@ -1,15 +1,16 @@
 import { NextResponse } from "next/server";
 import { users } from "@/lib/db";
 import { createToken, verifyToken } from "@/lib/auth";
+import { clientKey, rateLimit } from "@/lib/security";
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@rentaldress.com";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization") || "";
   const tokenFromHeader = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
-  const tokenFromQuery = new URL(request.url).searchParams.get("token");
-  const token = tokenFromHeader || tokenFromQuery;
+  const tokenFromCookie = request.headers.get("cookie")?.match(/(?:^|;\s*)admin_token=([^;]+)/)?.[1] || null;
+  const token = tokenFromHeader || tokenFromCookie;
 
   if (!token) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -25,7 +26,17 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { email, password } = await request.json();
+  if (!rateLimit(`auth:${clientKey(request)}`, 5)) {
+    return NextResponse.json({ error: "Too many login attempts" }, { status: 429 });
+  }
+
+  if (!ADMIN_EMAIL || !ADMIN_PASSWORD || !process.env.JWT_SECRET) {
+    return NextResponse.json({ error: "Authentication is not configured" }, { status: 503 });
+  }
+
+  const body = await request.json().catch(() => null);
+  const email = typeof body?.email === "string" ? body.email.trim() : "";
+  const password = typeof body?.password === "string" ? body.password : "";
 
   const user = users.find((u) => u.email === email);
 
@@ -40,5 +51,19 @@ export async function POST(request: Request) {
   }
 
   const token = await createToken(user);
-  return NextResponse.json({ token, user });
+  const response = NextResponse.json({ token, user });
+  response.cookies.set("admin_token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 7,
+  });
+  return response;
+}
+
+export async function DELETE() {
+  const response = NextResponse.json({ success: true });
+  response.cookies.set("admin_token", "", { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "strict", path: "/", maxAge: 0 });
+  return response;
 }

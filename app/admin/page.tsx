@@ -47,10 +47,9 @@ export default function AdminPage() {
   } | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     const user = localStorage.getItem("user");
 
-    if (!token || !user) {
+    if (!user) {
       router.push("/admin/login");
       return;
     }
@@ -59,9 +58,6 @@ export default function AdminPage() {
       try {
         const res = await fetch("/api/auth", {
           method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
         });
 
         if (!res.ok) {
@@ -100,6 +96,7 @@ export default function AdminPage() {
   }, [router]);
 
   const handleLogout = () => {
+    fetch("/api/auth", { method: "DELETE" });
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     router.push("/admin/login");

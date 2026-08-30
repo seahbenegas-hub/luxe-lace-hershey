@@ -31,7 +31,6 @@ export default function AdminLoginPage() {
         return;
       }
 
-      localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       router.push("/admin");
     } catch {
@@ -99,10 +98,6 @@ export default function AdminLoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 text-center text-xs text-secondary-400">
-            <p>Demo credentials:</p>
-            <p className="font-mono mt-1">admin@rentaldress.com / admin123</p>
-          </div>
         </div>
       </div>
     </div>

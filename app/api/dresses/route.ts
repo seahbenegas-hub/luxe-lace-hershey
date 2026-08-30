@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { dresses } from "@/lib/db";
 import { supabase, supabaseAdmin } from "@/lib/supabase";
+import { isAdmin, unauthorized } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    if (!(await isAdmin(request))) return unauthorized();
     if (!supabaseAdmin) {
       return NextResponse.json({ error: "Supabase service role key is not configured" }, { status: 503 });
     }
@@ -62,6 +64,7 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
+    if (!(await isAdmin(request))) return unauthorized();
     if (!supabaseAdmin) {
       return NextResponse.json({ error: "Supabase service role key is not configured" }, { status: 503 });
     }
@@ -100,6 +103,7 @@ export async function PATCH(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    if (!(await isAdmin(request))) return unauthorized();
     if (!supabaseAdmin) {
       return NextResponse.json({ error: "Supabase service role key is not configured" }, { status: 503 });
     }

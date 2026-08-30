@@ -1,13 +1,22 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { clientKey, rateLimit } from "@/lib/security";
 
 export async function POST(request: Request) {
   try {
+    if (!rateLimit(`receipt:${clientKey(request)}`, 10)) {
+      return NextResponse.json({ error: "Too many upload attempts" }, { status: 429 });
+    }
+
     const formData = await request.formData();
     const file = formData.get("file");
 
     if (!(file instanceof File)) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+    }
+
+    if (!file.type.startsWith("image/") || file.size > 10 * 1024 * 1024) {
+      return NextResponse.json({ error: "Receipt must be an image of 10 MB or smaller" }, { status: 400 });
     }
 
     const safeName = `${Date.now()}-${file.name.replace(/\s+/g, "-")}`;
@@ -39,13 +48,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const fallbackUrl = `data:${file.type || "application/octet-stream"};base64,${buffer.toString("base64")}`;
-
-    return NextResponse.json({
-      url: fallbackUrl,
-      fileName: file.name,
-    });
+    return NextResponse.json({ error: "Receipt storage is not configured" }, { status: 503 });
   } catch {
     return NextResponse.json({ error: "Receipt upload failed" }, { status: 500 });
   }

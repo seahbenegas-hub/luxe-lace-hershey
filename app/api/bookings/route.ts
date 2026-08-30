@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { bookings, addBooking, updateBooking } from "@/lib/db";
 import { supabase, supabaseAdmin } from "@/lib/supabase";
 import type { Booking } from "@/types";
+import { isAdmin, unauthorized } from "@/lib/security";
 
 const validStatuses = ["pending", "confirmed", "completed", "cancelled"] as const;
 const validPaymentStatuses = ["pending", "paid", "refunded"] as const;
@@ -29,6 +30,10 @@ function normalizeBooking(row: any): Booking {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const email = searchParams.get("email");
+
+  if (!email && !(await isAdmin(request))) {
+    return unauthorized();
+  }
 
   // Always try Supabase first
   if (supabase) {
@@ -66,15 +71,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Missing required booking fields" }, { status: 400 });
     }
 
+    const email = String(body.userEmail).trim().toLowerCase();
+    const startDate = new Date(body.startDate);
+    const endDate = new Date(body.endDate);
+    const totalPrice = Number(body.totalPrice);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || String(body.dressName).length > 120 || Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime()) || endDate < startDate || !Number.isFinite(totalPrice) || totalPrice < 0) {
+      return NextResponse.json({ error: "Invalid booking details" }, { status: 400 });
+    }
+
     const booking = {
       id: body.id || crypto.randomUUID(),
       dress_id: body.dressId,
       dress_name: body.dressName,
-      user_email: body.userEmail,
-      user_name: body.userName || "Guest",
-      start_date: body.startDate,
-      end_date: body.endDate,
-      total_price: Number(body.totalPrice || 0),
+      user_email: email,
+      user_name: typeof body.userName === "string" ? body.userName.trim().slice(0, 120) || "Guest" : "Guest",
+      start_date: startDate.toISOString(),
+      end_date: endDate.toISOString(),
+      total_price: totalPrice,
       status: validStatuses.includes(body.status) ? body.status : "pending",
       payment_status: validPaymentStatuses.includes(body.paymentStatus) ? body.paymentStatus : "pending",
       created_at: new Date().toISOString(),
@@ -83,7 +96,6 @@ export async function POST(request: Request) {
     };
 
     if (supabaseAdmin) {
-      console.log("📝 Attempting Supabase insert with booking:", JSON.stringify(booking, null, 2));
       const { data, error } = await supabaseAdmin.from("bookings").insert([booking]).select().single();
 
       if (error) {
@@ -92,9 +104,7 @@ export async function POST(request: Request) {
           code: error.code,
           details: error.details,
           hint: error.hint,
-          booking: booking
         });
-        // Return error to client for debugging
         return NextResponse.json({ 
           error: "Failed to save booking",
           details: error.message 
@@ -102,7 +112,6 @@ export async function POST(request: Request) {
       }
 
       if (data) {
-        console.log("✅ Booking saved to Supabase:", data);
         return NextResponse.json(normalizeBooking(data), { status: 201 });
       }
     } else {
@@ -135,6 +144,7 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
+    if (!(await isAdmin(request))) return unauthorized();
     const body = await request.json();
 
     if (!body?.id) {
@@ -151,7 +161,11 @@ export async function PATCH(request: Request) {
       updates.payment_status = body.paymentStatus;
     }
 
-    if (supabaseAdmin && Object.keys(updates).length > 0) {
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: "Valid booking update is required" }, { status: 400 });
+    }
+
+    if (supabaseAdmin) {
       const { error } = await supabaseAdmin
         .from("bookings")
         .update(updates)
@@ -160,20 +174,11 @@ export async function PATCH(request: Request) {
       if (!error) {
         return NextResponse.json({ success: true });
       }
+
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    const legacyUpdates: Partial<Booking> = {};
-
-    if (body.status && validStatuses.includes(body.status)) {
-      legacyUpdates.status = body.status;
-    }
-
-    if (body.paymentStatus && validPaymentStatuses.includes(body.paymentStatus)) {
-      legacyUpdates.paymentStatus = body.paymentStatus;
-    }
-
-    updateBooking(body.id, legacyUpdates);
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ error: "Database connection failed" }, { status: 503 });
   } catch {
     return NextResponse.json({ error: "Invalid update payload" }, { status: 400 });
   }
@@ -181,6 +186,7 @@ export async function PATCH(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    if (!(await isAdmin(request))) return unauthorized();
     const { id } = await request.json();
 
     if (!id) {
