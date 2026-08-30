@@ -17,6 +17,7 @@ const navLinks = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const isAdminRoute = pathname?.startsWith("/admin");
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
 
@@ -92,29 +93,31 @@ export default function Navbar() {
           </div>
 
           {/* User Actions */}
-          <div className="hidden md:flex items-center gap-3">
-            {user ? (
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-secondary-600 flex items-center gap-1">
-                  <User className="w-4 h-4" />
-                  {user.name}
-                </span>
-                <button
-                  onClick={handleLogout}
-                  className="p-2 rounded-lg text-secondary-500 hover:bg-secondary-100 hover:text-secondary-900 transition-colors"
+          {!isAdminRoute && (
+            <div className="hidden md:flex items-center gap-3">
+              {user ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-secondary-600 flex items-center gap-1">
+                    <User className="w-4 h-4" />
+                    {user.name}
+                  </span>
+                  <button
+                    onClick={handleLogout}
+                    className="p-2 rounded-lg text-secondary-500 hover:bg-secondary-100 hover:text-secondary-900 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  href="/consumer-signin"
+                  className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
                 >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
-              <Link
-                href="/consumer-signin"
-                className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
-              >
-                Sign In
-              </Link>
-            )}
-          </div>
+                  Sign In
+                </Link>
+              )}
+            </div>
+          )}
 
           {/* Mobile Menu Button */}
           <button
@@ -154,7 +157,7 @@ export default function Navbar() {
                 Admin Dashboard
               </Link>
             )}
-            {user ? (
+            {!isAdminRoute && user ? (
               <button
                 onClick={handleLogout}
                 className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50"
