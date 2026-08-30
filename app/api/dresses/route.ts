@@ -76,7 +76,7 @@ export async function PATCH(request: Request) {
       .update(normalizedUpdates)
       .eq("id", id)
       .select()
-      .single();
+      .maybeSingle();
 
     if (!error && data) {
       return NextResponse.json(data);
