@@ -5,11 +5,23 @@ import { isAdmin, unauthorized } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
 
-const normalizeDress = (dress: any) => ({
-  ...dress,
-  ...(dress.additional_day_price !== undefined ? { additionalDayPrice: Number(dress.additional_day_price || 0) } : {}),
-  ...(dress.additionalDayPrice !== undefined ? { additionalDayPrice: Number(dress.additionalDayPrice || 0) } : {}),
-});
+const normalizeDress = (dress: any) => {
+  const imageList = Array.isArray(dress.images) && dress.images.length > 0
+    ? dress.images.filter(Boolean).map((value: string) => String(value))
+    : Array.isArray(dress.image_list) && dress.image_list.length > 0
+      ? dress.image_list.filter(Boolean).map((value: string) => String(value))
+      : dress.image
+        ? [String(dress.image)]
+        : [];
+
+  return {
+    ...dress,
+    image: String(dress.image || imageList[0] || ""),
+    images: imageList,
+    ...(dress.additional_day_price !== undefined ? { additionalDayPrice: Number(dress.additional_day_price || 0) } : {}),
+    ...(dress.additionalDayPrice !== undefined ? { additionalDayPrice: Number(dress.additionalDayPrice || 0) } : {}),
+  };
+};
 
 export async function GET() {
   const database = supabaseAdmin || supabase;
@@ -42,6 +54,8 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
+    const images = Array.isArray(body.images) ? body.images.filter(Boolean).map(String) : [];
+    const primaryImage = String(body.image || images[0] || "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&auto=format&fit=crop");
     const draftDress = {
       id: body.id || crypto.randomUUID(),
       name: body.name || "New Dress",
@@ -51,7 +65,8 @@ export async function POST(request: Request) {
       size: Array.isArray(body.size) ? body.size : ["S", "M", "L"],
       color: body.color || "Neutral",
       occasion: body.occasion || "General",
-      image: body.image || "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&auto=format&fit=crop",
+      image: primaryImage,
+      images: images.length ? images : [primaryImage],
       available: body.available !== false,
       category: body.category || "New",
       featured: body.featured === true,
@@ -83,9 +98,13 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "Missing dress id or updates" }, { status: 400 });
     }
 
-    const { additionalDayPrice, additional_day_price, ...restUpdates } = updates;
+    const { additionalDayPrice, additional_day_price, images, ...restUpdates } = updates;
+    const normalizedImages = Array.isArray(images) ? images.filter(Boolean).map(String) : [];
+    const primaryImage = normalizedImages.length > 0 ? normalizedImages[0] : restUpdates.image;
     const normalizedUpdates = {
       ...restUpdates,
+      ...(primaryImage ? { image: String(primaryImage) } : {}),
+      ...(normalizedImages.length > 0 ? { images: normalizedImages } : {}),
       ...(additionalDayPrice !== undefined || additional_day_price !== undefined
         ? { additional_day_price: Number(additionalDayPrice ?? additional_day_price ?? 0) }
         : {}),

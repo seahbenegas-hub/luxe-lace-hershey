@@ -42,6 +42,7 @@ export default function AdminPage() {
     price: string;
     additionalDayPrice: string;
     image: string;
+    images: string[];
     sizeText: string;
     category: string;
     color: string;
@@ -142,6 +143,7 @@ export default function AdminPage() {
       price: String(dress.price),
       additionalDayPrice: String(dress.additionalDayPrice ?? 0),
       image: dress.image,
+      images: dress.images && dress.images.length > 0 ? dress.images : [dress.image],
       sizeText: dress.size.join(", "),
       category: dress.category,
       color: dress.color,
@@ -159,6 +161,7 @@ export default function AdminPage() {
       price: "0",
       additionalDayPrice: "0",
       image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&auto=format&fit=crop",
+      images: ["https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&auto=format&fit=crop"],
       sizeText: "XS, S, M, L",
       category: "New",
       color: "Neutral",
@@ -223,23 +226,38 @@ export default function AdminPage() {
     return convertedBlob;
   };
 
-  const uploadDressImage = async (file: File) => {
+  const uploadDressImage = async (file: File | File[]) => {
     setInventoryError("");
     setImageUploading(true);
 
     try {
-      const preparedFile = await prepareMobileUpload(file);
-      const formData = new FormData();
-      formData.append("file", preparedFile, `${(file.name || "photo").replace(/\.[^.]+$/, "") || "photo"}.jpg`);
-      const res = await fetch("/api/dress-image", { method: "POST", body: formData });
-      const result = await res.json();
+      const files = Array.isArray(file) ? file : [file];
+      const uploadedUrls: string[] = [];
 
-      if (!res.ok) {
-        setInventoryError(result.error || "Failed to upload dress image");
-        return;
+      for (const item of files) {
+        const preparedFile = await prepareMobileUpload(item);
+        const formData = new FormData();
+        formData.append("file", preparedFile, `${(item.name || "photo").replace(/\.[^.]+$/, "") || "photo"}.jpg`);
+        const res = await fetch("/api/dress-image", { method: "POST", body: formData });
+        const result = await res.json();
+
+        if (!res.ok) {
+          setInventoryError(result.error || "Failed to upload dress image");
+          return;
+        }
+
+        uploadedUrls.push(result.url);
       }
 
-      setEditForm((current) => current ? { ...current, image: result.url } : current);
+      setEditForm((current) => {
+        if (!current) return current;
+        const mergedImages = Array.from(new Set([...(current.images || []), ...uploadedUrls]));
+        return {
+          ...current,
+          image: mergedImages[0] || current.image,
+          images: mergedImages,
+        };
+      });
     } catch (error) {
       console.error("Failed to upload dress image:", error);
       setInventoryError(error instanceof Error ? error.message : "Failed to upload dress image");
@@ -252,13 +270,18 @@ export default function AdminPage() {
     if (!editForm) return;
     setInventoryError("");
 
+    const images = (editForm.images && editForm.images.length > 0 ? editForm.images : [editForm.image])
+      .map((url) => url.trim())
+      .filter(Boolean);
+
     const payload = {
       ...(isAddingNew ? {} : { id: editingDressId }),
       name: editForm.name.trim(),
       description: editForm.description.trim(),
       price: Number(editForm.price),
       additionalDayPrice: Number(editForm.additionalDayPrice || 0),
-      image: editForm.image.trim(),
+      image: images[0] || editForm.image.trim(),
+      images,
       size: editForm.sizeText
         .split(",")
         .map((size) => size.trim())
@@ -664,21 +687,39 @@ export default function AdminPage() {
                     </label>
                   </div>
                   <input value={editForm.sizeText} onChange={(e) => setEditForm({ ...editForm, sizeText: e.target.value })} placeholder="Sizes: XS, S, M" className="md:col-span-2 p-2 border border-secondary-200 rounded-lg" />
-                  <input value={editForm.image} onChange={(e) => setEditForm({ ...editForm, image: e.target.value })} placeholder="Image URL" className="md:col-span-2 p-2 border border-secondary-200 rounded-lg" />
+                  <input value={editForm.image} onChange={(e) => setEditForm({ ...editForm, image: e.target.value, images: [e.target.value, ...editForm.images.filter((url) => url !== e.target.value)].slice(0, 6) })} placeholder="Primary image URL" className="md:col-span-2 p-2 border border-secondary-200 rounded-lg" />
                   <label className="md:col-span-2 flex items-center gap-2 p-2 border border-secondary-200 rounded-lg bg-white text-sm text-secondary-600 cursor-pointer">
                     <Upload className="w-4 h-4" />
-                    {imageUploading ? "Uploading image..." : "Upload dress photo"}
+                    {imageUploading ? "Uploading images..." : "Upload dress photos"}
                     <input
                       type="file"
                       accept="image/*"
+                      multiple
                       disabled={imageUploading}
                       onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) uploadDressImage(file);
+                        const files = Array.from(e.target.files || []);
+                        if (files.length) uploadDressImage(files);
                       }}
                       className="sr-only"
                     />
                   </label>
+                  {editForm.images.length > 0 && (
+                    <div className="md:col-span-2 flex flex-wrap gap-2">
+                      {editForm.images.map((url, index) => (
+                        <div key={`${url}-${index}`} className="relative h-16 w-16 overflow-hidden rounded-lg border border-secondary-200 bg-white">
+                          <img src={url} alt={`Dress preview ${index + 1}`} className="h-full w-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => setEditForm({ ...editForm, images: editForm.images.filter((item) => item !== url), image: editForm.image === url ? (editForm.images.filter((item) => item !== url)[0] || "") : editForm.image })}
+                            className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-black/70 text-[10px] text-white"
+                            aria-label="Remove photo"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   <textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} placeholder="Description" className="md:col-span-2 p-2 border border-secondary-200 rounded-lg min-h-[80px]" />
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -756,13 +797,20 @@ export default function AdminPage() {
                         </td>
                         <td className="py-3 px-4 text-secondary-600">
                           {isEditing ? (
-                            <input
-                              value={editForm.image}
-                              onChange={(e) => setEditForm({ ...editForm, image: e.target.value })}
-                              className="w-full p-2 border border-secondary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                            />
+                            <div className="space-y-2">
+                              <input
+                                value={editForm.image}
+                                onChange={(e) => setEditForm({ ...editForm, image: e.target.value, images: [e.target.value, ...editForm.images.filter((url) => url !== e.target.value)].slice(0, 6) })}
+                                className="w-full p-2 border border-secondary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                              />
+                              <div className="flex gap-2">
+                                {(editForm.images || []).slice(0, 3).map((url, index) => (
+                                  <img key={`${url}-${index}`} src={url} alt={`${dress.name} image ${index + 1}`} className="h-10 w-10 object-cover rounded-lg border border-secondary-200" />
+                                ))}
+                              </div>
+                            </div>
                           ) : (
-                            <img src={dress.image} alt={dress.name} className="h-12 w-12 object-cover rounded-lg border border-secondary-200" />
+                            <img src={(dress.images && dress.images.length > 0 ? dress.images[0] : dress.image)} alt={dress.name} className="h-12 w-12 object-cover rounded-lg border border-secondary-200" />
                           )}
                         </td>
                         <td className="py-3 px-4 font-medium text-primary-600">

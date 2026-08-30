@@ -8,6 +8,7 @@ export interface Dress {
   color: string;
   occasion: string;
   image: string;
+  images?: string[];
   available: boolean;
   category: string;
   featured?: boolean;
