@@ -83,14 +83,7 @@ export default function Navbar() {
                   <LogOut className="w-4 h-4" />
                 </button>
               </div>
-            ) : (
-              <Link
-                href="/admin/login"
-                className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
-              >
-                Sign In
-              </Link>
-            )}
+            ) : null}
           </div>
 
           {/* Mobile Menu Button */}
@@ -138,15 +131,7 @@ export default function Navbar() {
               >
                 Sign Out
               </button>
-            ) : (
-              <Link
-                href="/admin/login"
-                onClick={() => setIsOpen(false)}
-                className="block px-3 py-2 rounded-lg text-sm font-medium bg-primary-600 text-white text-center"
-              >
-                Sign In
-              </Link>
-            )}
+            ) : null}
           </div>
         </div>
       )}
