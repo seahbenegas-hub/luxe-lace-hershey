@@ -83,17 +83,31 @@ export async function POST(request: Request) {
     };
 
     if (supabaseAdmin) {
+      console.log("📝 Attempting Supabase insert with booking:", JSON.stringify(booking, null, 2));
       const { data, error } = await supabaseAdmin.from("bookings").insert([booking]).select().single();
 
       if (error) {
-        console.error("Supabase booking insert error:", error);
-        // Log the booking object to verify field names
-        console.error("Booking object being inserted:", booking);
+        console.error("❌ Supabase insert failed:", {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint,
+          booking: booking
+        });
+        // Return error to client for debugging
+        return NextResponse.json({ 
+          error: "Failed to save booking",
+          details: error.message 
+        }, { status: 400 });
       }
 
-      if (!error && data) {
+      if (data) {
+        console.log("✅ Booking saved to Supabase:", data);
         return NextResponse.json(normalizeBooking(data), { status: 201 });
       }
+    } else {
+      console.error("❌ supabaseAdmin client not initialized");
+      return NextResponse.json({ error: "Database connection failed" }, { status: 500 });
     }
 
     const legacyBooking: Booking = {

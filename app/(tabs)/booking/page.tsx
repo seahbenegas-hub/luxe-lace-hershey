@@ -85,31 +85,43 @@ function BookingPageContent() {
     const newBookingId = generateId();
     setBookingId(newBookingId);
 
-    await fetch("/api/bookings", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: newBookingId,
-        dressId: selectedDress!.id,
-        dressName: selectedDress!.name,
-        userEmail,
-        userName,
-        startDate: startDate!.toISOString(),
-        endDate: endDate!.toISOString(),
-        totalPrice,
-        status: "confirmed",
-        paymentStatus: "paid",
-        paymentReceipt: receiptValue || "receipt-uploaded",
-      }),
-    });
+    try {
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: newBookingId,
+          dressId: selectedDress!.id,
+          dressName: selectedDress!.name,
+          userEmail,
+          userName,
+          startDate: startDate!.toISOString(),
+          endDate: endDate!.toISOString(),
+          totalPrice,
+          status: "confirmed",
+          paymentStatus: "paid",
+          paymentReceipt: receiptValue || "receipt-uploaded",
+        }),
+      });
 
-    // Store user info in localStorage so My Rentals can fetch their bookings
-    localStorage.setItem("user", JSON.stringify({
-      email: userEmail,
-      name: userName,
-    }));
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(`Booking failed: ${errorData.details || errorData.error}`);
+        console.error("Booking API error:", errorData);
+        return;
+      }
 
-    setStep("confirmed");
+      // Store user info in localStorage so My Rentals can fetch their bookings
+      localStorage.setItem("user", JSON.stringify({
+        email: userEmail,
+        name: userName,
+      }));
+
+      setStep("confirmed");
+    } catch (err) {
+      setError(`Error saving booking: ${err instanceof Error ? err.message : "Unknown error"}`);
+      console.error("Booking error:", err);
+    }
   };
 
   if (loading) {
