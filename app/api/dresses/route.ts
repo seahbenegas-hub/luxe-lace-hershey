@@ -41,6 +41,7 @@ export async function POST(request: Request) {
       name: body.name || "New Dress",
       description: body.description || "",
       price: Number(body.price || 0),
+      additional_day_price: Number(body.additionalDayPrice ?? 0),
       size: Array.isArray(body.size) ? body.size : ["S", "M", "L"],
       color: body.color || "Neutral",
       occasion: body.occasion || "General",
@@ -78,6 +79,7 @@ export async function PATCH(request: Request) {
 
     const normalizedUpdates = {
       ...updates,
+      ...(updates.additionalDayPrice !== undefined ? { additional_day_price: Number(updates.additionalDayPrice || 0) } : {}),
       ...(updates.size !== undefined && Array.isArray(updates.size)
         ? { size: updates.size }
         : {}),

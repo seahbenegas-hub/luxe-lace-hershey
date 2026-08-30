@@ -3,6 +3,7 @@ export interface Dress {
   name: string;
   description: string;
   price: number;
+  additionalDayPrice?: number;
   size: string[];
   color: string;
   occasion: string;
