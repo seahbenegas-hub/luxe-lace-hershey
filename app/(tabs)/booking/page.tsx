@@ -103,6 +103,12 @@ function BookingPageContent() {
       }),
     });
 
+    // Store user info in localStorage so My Rentals can fetch their bookings
+    localStorage.setItem("user", JSON.stringify({
+      email: userEmail,
+      name: userName,
+    }));
+
     setStep("confirmed");
   };
 
