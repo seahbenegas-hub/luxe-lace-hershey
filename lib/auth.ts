@@ -1,7 +1,7 @@
 import { SignJWT, jwtVerify } from "jose";
 import { User } from "@/types";
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET || "your-secret-key-min-32-characters-long");
+const secret = new TextEncoder().encode(process.env.JWT_SECRET || "M7MP4Lp2ZuM0sgdMA6ZjgbLqxT2u617c0fzVi1f4NDi");
 
 export async function createToken(user: User): Promise<string> {
   return new SignJWT({ ...user })
