@@ -7,7 +7,7 @@ import BookingCalendar from "@/components/BookingCalendar";
 import ReceiptUpload from "@/components/QRPayment";
 import { Booking, Dress } from "@/types";
 import { formatPrice, calculateTotalPrice, generateId } from "@/lib/utils";
-import { eachDayOfInterval, isSameDay, format, startOfDay } from "date-fns";
+import { eachDayOfInterval, isSameDay, format, startOfDay, addDays } from "date-fns";
 import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
 
 export default function BookingPage() {
@@ -27,6 +27,7 @@ function BookingPageContent() {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [bookedDates, setBookedDates] = useState<Date[]>([]);
+  const [extraDays, setExtraDays] = useState(0);
   const [size, setSize] = useState("");
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
@@ -81,6 +82,16 @@ function BookingPageContent() {
       .catch(() => setBookedDates([]));
   }, [selectedDress]);
 
+  useEffect(() => {
+    if (!startDate) {
+      setEndDate(null);
+      return;
+    }
+
+    const rentalDays = 3 + extraDays;
+    setEndDate(addDays(startDate, rentalDays - 1));
+  }, [startDate, extraDays]);
+
   const totalPrice = selectedDress && startDate && endDate
     ? calculateTotalPrice(selectedDress.price, startDate.toISOString(), endDate.toISOString())
     : 0;
@@ -93,7 +104,7 @@ function BookingPageContent() {
   );
 
   const isThreeDayWindowValid = Boolean(
-    selectedDress && startDate && endDate && endDate.getTime() - startDate.getTime() <= 2 * 24 * 60 * 60 * 1000
+    selectedDress && startDate && endDate && endDate.getTime() - startDate.getTime() <= (2 + extraDays) * 24 * 60 * 60 * 1000
   );
 
   const handleContinue = () => {
@@ -237,12 +248,33 @@ function BookingPageContent() {
           {selectedDress && (
             <div className="bg-white rounded-2xl border border-secondary-200 p-6">
               <h2 className="text-lg font-semibold text-secondary-900 mb-4">2. Select Rental Dates</h2>
+              <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-medium text-secondary-700">Rental Length</p>
+                  <p className="text-xs text-secondary-500">Base rental: 3 days. Add optional extra days if needed.</p>
+                </div>
+                <label className="flex items-center gap-2 text-sm text-secondary-700">
+                  <span>Extra days</span>
+                  <select
+                    value={extraDays}
+                    onChange={(e) => setExtraDays(Number(e.target.value))}
+                    className="px-3 py-2 bg-secondary-50 border border-secondary-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value={0}>0</option>
+                    <option value={1}>1</option>
+                    <option value={2}>2</option>
+                    <option value={3}>3</option>
+                  </select>
+                </label>
+              </div>
+
               <BookingCalendar
                 selectedStart={startDate}
                 selectedEnd={endDate}
                 onSelectStart={setStartDate}
                 onSelectEnd={setEndDate}
                 blockedDates={bookedDates}
+                extraDays={extraDays}
               />
               {startDate && endDate && (
                 <div className="mt-4 p-4 bg-primary-50 rounded-xl">

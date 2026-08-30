@@ -11,9 +11,10 @@ interface BookingCalendarProps {
   onSelectStart: (date: Date) => void;
   onSelectEnd: (date: Date) => void;
   blockedDates?: Date[];
+  extraDays?: number;
 }
 
-export default function BookingCalendar({ selectedStart, selectedEnd, onSelectStart, onSelectEnd, blockedDates = [] }: BookingCalendarProps) {
+export default function BookingCalendar({ selectedStart, selectedEnd, onSelectStart, onSelectEnd, blockedDates = [], extraDays = 0 }: BookingCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const today = startOfDay(new Date());
 
@@ -33,7 +34,8 @@ export default function BookingCalendar({ selectedStart, selectedEnd, onSelectSt
   const handleDateClick = (day: Date) => {
     if (isBefore(day, today) || isBooked(day)) return;
 
-    const endDate = addDays(day, 2);
+    const totalRentalDays = 3 + extraDays;
+    const endDate = addDays(day, totalRentalDays - 1);
 
     if (!selectedStart || (selectedStart && selectedEnd && selectedStart.getTime() === selectedEnd.getTime())) {
       onSelectStart(day);
