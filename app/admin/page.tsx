@@ -86,6 +86,22 @@ export default function AdminPage() {
     router.push("/admin/login");
   };
 
+  const refreshBookings = async () => {
+    setLoading(true);
+    try {
+      const [bookingsData, dressesData] = await Promise.all([
+        fetch("/api/bookings").then((r) => r.json()),
+        fetch("/api/dresses").then((r) => r.json()),
+      ]);
+      setBookings(bookingsData);
+      setDresses(dressesData);
+    } catch (error) {
+      console.error("Failed to refresh data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const updateBookingStatus = async (id: string, status: string) => {
     await fetch("/api/bookings", {
       method: "PATCH",
@@ -159,13 +175,23 @@ export default function AdminPage() {
             <LayoutDashboard className="w-6 h-6 text-primary-600" />
             <h1 className="text-lg font-bold text-secondary-900">Admin Dashboard</h1>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
-            Sign Out
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={refreshBookings}
+              disabled={loading}
+              className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors disabled:opacity-50"
+            >
+              <TrendingUp className="w-4 h-4" />
+              Refresh
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              Sign Out
+            </button>
+          </div>
         </div>
       </header>
 

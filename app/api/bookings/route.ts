@@ -30,6 +30,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const email = searchParams.get("email");
 
+  // Always try Supabase first
   if (supabase) {
     let query = supabase.from("bookings").select("*");
 
@@ -39,21 +40,17 @@ export async function GET(request: Request) {
 
     const { data, error } = await query.order("created_at", { ascending: false });
 
-    if (!error && data) {
-      const normalized = data.map(normalizeBooking);
-
-      if (normalized.length > 0 || bookings.length === 0) {
-        return NextResponse.json(normalized);
-      }
-
-      if (email) {
-        return NextResponse.json(bookings.filter((b) => b.userEmail === email));
-      }
-
-      return NextResponse.json(bookings);
+    // If we got a successful response from Supabase (even if empty), return it
+    if (!error) {
+      const normalized = data ? data.map(normalizeBooking) : [];
+      return NextResponse.json(normalized);
     }
+
+    // If there was an error, fall back to local
+    console.error("Supabase booking fetch error:", error);
   }
 
+  // Fallback to local bookings only if Supabase failed
   if (email) {
     return NextResponse.json(bookings.filter((b) => b.userEmail === email));
   }
