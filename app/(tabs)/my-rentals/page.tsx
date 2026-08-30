@@ -13,7 +13,7 @@ export default function MyRentalsPage() {
   const [userEmail, setUserEmail] = useState("");
 
   useEffect(() => {
-    const stored = localStorage.getItem("user");
+    const stored = localStorage.getItem("consumer_user") || localStorage.getItem("user");
     if (stored) {
       const user = JSON.parse(stored);
       setUserEmail(user.email);

@@ -31,8 +31,11 @@ export default function AdminLoginPage() {
         return;
       }
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("admin_token", data.token);
+      localStorage.setItem("admin_user", JSON.stringify(data.user));
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      window.dispatchEvent(new Event("user-updated"));
       router.push("/admin");
     } catch {
       setError("Something went wrong");
