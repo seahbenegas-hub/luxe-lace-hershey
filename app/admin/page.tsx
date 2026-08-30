@@ -637,7 +637,32 @@ export default function AdminPage() {
                   <input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} placeholder="Dress name" className="p-2 border border-secondary-200 rounded-lg" />
                   <input value={editForm.category} onChange={(e) => setEditForm({ ...editForm, category: e.target.value })} placeholder="Category" className="p-2 border border-secondary-200 rounded-lg" />
                   <input value={editForm.color} onChange={(e) => setEditForm({ ...editForm, color: e.target.value })} placeholder="Color" className="p-2 border border-secondary-200 rounded-lg" />
-                  <input type="number" value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: e.target.value })} placeholder="Price" className="p-2 border border-secondary-200 rounded-lg" />
+                  <div className="grid grid-cols-2 gap-2 md:col-span-2">
+                    <label className="flex flex-col gap-1 text-sm text-secondary-700">
+                      <span>3-Day Rent Fee</span>
+                      <input
+                        type="number"
+                        value={Math.round((Number(editForm.price || 0) * 3) * 100) / 100}
+                        onChange={(e) => {
+                          const feeValue = Number(e.target.value || 0);
+                          const nextDaily = feeValue > 0 ? feeValue / 3 : 0;
+                          setEditForm({ ...editForm, price: String(nextDaily) });
+                        }}
+                        placeholder="3-Day fee"
+                        className="p-2 border border-secondary-200 rounded-lg"
+                      />
+                    </label>
+                    <label className="flex flex-col gap-1 text-sm text-secondary-700">
+                      <span>Add'l Day Rate</span>
+                      <input
+                        type="number"
+                        value={editForm.price}
+                        onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
+                        placeholder="Daily rate"
+                        className="p-2 border border-secondary-200 rounded-lg"
+                      />
+                    </label>
+                  </div>
                   <input value={editForm.sizeText} onChange={(e) => setEditForm({ ...editForm, sizeText: e.target.value })} placeholder="Sizes: XS, S, M" className="md:col-span-2 p-2 border border-secondary-200 rounded-lg" />
                   <input value={editForm.image} onChange={(e) => setEditForm({ ...editForm, image: e.target.value })} placeholder="Image URL" className="md:col-span-2 p-2 border border-secondary-200 rounded-lg" />
                   <label className="md:col-span-2 flex items-center gap-2 p-2 border border-secondary-200 rounded-lg bg-white text-sm text-secondary-600 cursor-pointer">
@@ -746,14 +771,14 @@ export default function AdminPage() {
                               type="number"
                               value={editForm.price}
                               onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
-                              className="w-24 p-2 border border-secondary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                              className="w-28 p-2 border border-secondary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                             />
                           ) : (
-                            formatPrice(dress.price * 3)
+                            formatPrice(dress.price)
                           )}
                         </td>
                         <td className="py-3 px-4 font-medium text-secondary-700">
-                          {formatPrice(dress.price)}
+                          {formatPrice(0)}
                         </td>
                         <td className="py-3 px-4">
                           {isEditing ? (
