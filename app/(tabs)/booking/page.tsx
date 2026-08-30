@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import BookingCalendar from "@/components/BookingCalendar";
@@ -11,6 +11,14 @@ import { format } from "date-fns";
 import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
 
 export default function BookingPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center py-20"><Loader2 className="w-10 h-10 animate-spin text-primary-600" /></div>}>
+      <BookingPageContent />
+    </Suspense>
+  );
+}
+
+function BookingPageContent() {
   const searchParams = useSearchParams();
   const dressId = searchParams.get("dress");
 

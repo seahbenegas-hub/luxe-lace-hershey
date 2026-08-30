@@ -69,7 +69,10 @@ export default function BookingCalendar({ selectedStart, selectedEnd, onSelectSt
           </div>
         ))}
         {days.map((day, index) => {
-          const isSelected = isSameDay(day, selectedStart) || isSameDay(day, selectedEnd);
+          const isSelected = Boolean(
+            (selectedStart && isSameDay(day, selectedStart)) ||
+            (selectedEnd && isSameDay(day, selectedEnd))
+          );
           const isRange = isInRange(day);
           const isPast = isBefore(day, today);
           const isCurrentMonth = isSameMonth(day, currentMonth);
