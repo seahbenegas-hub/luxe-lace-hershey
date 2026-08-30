@@ -4,15 +4,8 @@ import { ArrowRight, Sparkles, Truck, Shield, Clock } from "lucide-react";
 import { supabaseAdmin } from "@/lib/supabase";
 import { Dress } from "@/types";
 
-const fallbackDresses = [
-  { name: "Elegant Evening Gown", price: "₱150", image: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=600&auto=format&fit=crop", category: "Formal" },
-  { name: "Cocktail Party Dress", price: "₱85", image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600&auto=format&fit=crop", category: "Party" },
-  { name: "Summer Floral Maxi", price: "₱65", image: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=600&auto=format&fit=crop", category: "Casual" },
-  { name: "Red Carpet Glamour", price: "₱200", image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=600&auto=format&fit=crop", category: "Formal" },
-];
-
 async function getFeaturedDresses() {
-  if (!supabaseAdmin) return fallbackDresses;
+  if (!supabaseAdmin) return [];
 
   const { data } = await supabaseAdmin
     .from("dresses")
@@ -22,8 +15,7 @@ async function getFeaturedDresses() {
     .order("created_at", { ascending: false })
     .limit(4);
 
-  if (!data || data.length === 0) return fallbackDresses;
-  return data as Dress[];
+  return (data || []) as Dress[];
 }
 
 export default async function HomePage() {
@@ -143,7 +135,7 @@ export default async function HomePage() {
               </div>
               <div className="p-4">
                 <h3 className="font-semibold text-secondary-900">{dress.name}</h3>
-                <p className="text-primary-600 font-bold mt-1">{typeof dress.price === "number" ? `₱${dress.price}` : dress.price}<span className="text-sm text-secondary-400 font-normal">/day</span></p>
+                <p className="text-primary-600 font-bold mt-1">₱{dress.price}<span className="text-sm text-secondary-400 font-normal">/day</span></p>
               </div>
             </div>
           ))}
