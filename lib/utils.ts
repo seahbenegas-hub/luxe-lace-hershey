@@ -21,6 +21,6 @@ export function calculateTotalPrice(pricePerDay: number, startDate: string, endD
   const start = new Date(startDate);
   const end = new Date(endDate);
   const diffTime = Math.abs(end.getTime() - start.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return pricePerDay * Math.max(diffDays, 1);
+  const diffDays = Math.max(Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1, 1);
+  return pricePerDay * diffDays;
 }

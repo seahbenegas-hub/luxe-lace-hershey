@@ -28,16 +28,25 @@ export default function BookingCalendar({ selectedStart, selectedEnd, onSelectSt
   const handleDateClick = (day: Date) => {
     if (isBefore(day, today)) return;
 
-    if (!selectedStart || (selectedStart && selectedEnd)) {
+    if (!selectedStart) {
       onSelectStart(day);
       onSelectEnd(day);
-    } else if (selectedStart && !selectedEnd) {
-      if (day < selectedStart) {
-        onSelectStart(day);
-      } else {
-        onSelectEnd(day);
-      }
+      return;
     }
+
+    if (selectedStart && selectedEnd) {
+      onSelectStart(day);
+      onSelectEnd(day);
+      return;
+    }
+
+    if (day < selectedStart) {
+      onSelectStart(day);
+      onSelectEnd(selectedStart);
+      return;
+    }
+
+    onSelectEnd(day);
   };
 
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
