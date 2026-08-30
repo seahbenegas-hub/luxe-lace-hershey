@@ -21,7 +21,7 @@ const steps = [
   },
   {
     icon: Truck,
-    title: "Free Delivery",
+    title: "Delivery",
     description: "We deliver the dress to your door, professionally cleaned and ready to wear. Return using the prepaid packaging.",
     color: "bg-orange-50 text-orange-600",
   },
@@ -65,35 +65,6 @@ export default function HowItWorksPage() {
             </div>
           </div>
         ))}
-      </div>
-
-      <div className="mt-20 bg-white rounded-2xl border border-secondary-200 p-8">
-        <h2 className="text-2xl font-bold text-secondary-900 mb-6 text-center">Rental Price Breakdown</h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            {
-              title: "Base rental",
-              value: "$55–$250",
-              detail: "Based on dress style and designer label.",
-            },
-            {
-              title: "Rental period",
-              value: "3–7 days",
-              detail: "Choose the dates that match your event schedule.",
-            },
-            {
-              title: "Included",
-              value: "Everything",
-              detail: "Cleaning, delivery, and return packaging are included.",
-            },
-          ].map((item) => (
-            <div key={item.title} className="rounded-xl bg-secondary-50 border border-secondary-200 p-6 text-center">
-              <p className="text-sm uppercase tracking-wide text-secondary-500 mb-2">{item.title}</p>
-              <p className="text-2xl font-bold text-secondary-900 mb-2">{item.value}</p>
-              <p className="text-sm text-secondary-500">{item.detail}</p>
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* FAQ */}
