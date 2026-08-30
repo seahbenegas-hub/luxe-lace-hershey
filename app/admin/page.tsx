@@ -256,6 +256,26 @@ export default function AdminPage() {
     );
   };
 
+  const deleteBooking = async (bookingId: string) => {
+    if (!confirm("Are you sure you want to delete this booking?")) {
+      return;
+    }
+
+    const res = await fetch("/api/bookings", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: bookingId }),
+    });
+
+    if (!res.ok) {
+      const result = await res.json().catch(() => null);
+      alert(result?.error || "Failed to delete booking");
+      return;
+    }
+
+    setBookings((prev) => prev.filter((booking) => booking.id !== bookingId));
+  };
+
   const filteredBookings = bookings.filter(
     (b) =>
       b.dressName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -507,6 +527,12 @@ export default function AdminPage() {
                               Cancel
                             </button>
                           )}
+                          <button
+                            onClick={() => deleteBooking(booking.id)}
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-red-50 text-red-700 rounded text-xs font-medium hover:bg-red-100"
+                          >
+                            <Trash2 className="w-3 h-3" /> Delete
+                          </button>
                         </div>
                       </td>
                     </tr>

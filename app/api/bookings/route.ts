@@ -178,3 +178,28 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Invalid update payload" }, { status: 400 });
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const { id } = await request.json();
+
+    if (!id) {
+      return NextResponse.json({ error: "Booking id is required" }, { status: 400 });
+    }
+
+    if (supabaseAdmin) {
+      const { error } = await supabaseAdmin.from("bookings").delete().eq("id", id);
+
+      if (!error) {
+        return NextResponse.json({ success: true });
+      }
+
+      console.error("Supabase booking delete error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ error: "Database connection failed" }, { status: 503 });
+  } catch {
+    return NextResponse.json({ error: "Invalid delete payload" }, { status: 400 });
+  }
+}
