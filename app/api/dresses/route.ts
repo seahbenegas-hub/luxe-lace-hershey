@@ -47,6 +47,7 @@ export async function POST(request: Request) {
       image: body.image || "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&auto=format&fit=crop",
       available: body.available !== false,
       category: body.category || "New",
+      featured: body.featured === true,
     };
 
     const { data, error } = await supabaseAdmin.from("dresses").insert([draftDress]).select().single();

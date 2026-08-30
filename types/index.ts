@@ -9,6 +9,7 @@ export interface Dress {
   image: string;
   available: boolean;
   category: string;
+  featured?: boolean;
 }
 
 export interface Booking {

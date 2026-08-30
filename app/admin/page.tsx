@@ -45,6 +45,7 @@ export default function AdminPage() {
     category: string;
     color: string;
     available: boolean;
+    featured: boolean;
   } | null>(null);
 
   useEffect(() => {
@@ -143,6 +144,7 @@ export default function AdminPage() {
       category: dress.category,
       color: dress.color,
       available: dress.available,
+      featured: dress.featured === true,
     });
   };
 
@@ -158,6 +160,7 @@ export default function AdminPage() {
       category: "New",
       color: "Neutral",
       available: true,
+      featured: false,
     });
   };
 
@@ -207,6 +210,7 @@ export default function AdminPage() {
       category: editForm.category.trim(),
       color: editForm.color.trim(),
       available: editForm.available,
+      featured: editForm.featured,
       occasion: "General",
     };
 
@@ -601,6 +605,10 @@ export default function AdminPage() {
                     <input type="checkbox" checked={editForm.available} onChange={(e) => setEditForm({ ...editForm, available: e.target.checked })} />
                     Available
                   </label>
+                  <label className="flex items-center gap-2 text-sm text-secondary-700">
+                    <input type="checkbox" checked={editForm.featured} onChange={(e) => setEditForm({ ...editForm, featured: e.target.checked })} />
+                    Featured on homepage
+                  </label>
                   <div className="flex gap-2">
                     <button onClick={saveDressEdits} disabled={imageUploading} className="inline-flex items-center gap-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"> <Save className="w-4 h-4" /> Save Dress </button>
                     <button onClick={cancelEditDress} className="inline-flex items-center gap-1 px-3 py-2 bg-secondary-200 text-secondary-700 rounded-lg text-sm font-medium hover:bg-secondary-300"> <X className="w-4 h-4" /> Cancel </button>
@@ -618,6 +626,7 @@ export default function AdminPage() {
                     <th className="text-left py-3 px-4 font-medium text-secondary-500">Size</th>
                     <th className="text-left py-3 px-4 font-medium text-secondary-500">Image</th>
                     <th className="text-left py-3 px-4 font-medium text-secondary-500">Price/Day</th>
+                    <th className="text-left py-3 px-4 font-medium text-secondary-500">Featured</th>
                     <th className="text-left py-3 px-4 font-medium text-secondary-500">Status</th>
                     <th className="text-left py-3 px-4 font-medium text-secondary-500">Actions</th>
                   </tr>
@@ -682,6 +691,24 @@ export default function AdminPage() {
                             />
                           ) : (
                             formatPrice(dress.price)
+                          )}
+                        </td>
+                        <td className="py-3 px-4">
+                          {isEditing ? (
+                            <label className="flex items-center gap-2 text-sm text-secondary-700">
+                              <input
+                                type="checkbox"
+                                checked={editForm.featured}
+                                onChange={(e) => setEditForm({ ...editForm, featured: e.target.checked })}
+                              />
+                              Yes
+                            </label>
+                          ) : (
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              dress.featured ? "bg-pink-50 text-pink-700" : "bg-secondary-100 text-secondary-500"
+                            }`}>
+                              {dress.featured ? "Featured" : "No"}
+                            </span>
                           )}
                         </td>
                         <td className="py-3 px-4">
