@@ -111,6 +111,7 @@ export default function AdminPage() {
     fetch("/api/auth", { method: "DELETE" });
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    window.dispatchEvent(new Event("user-state-changed"));
     router.push("/admin/login");
   };
 

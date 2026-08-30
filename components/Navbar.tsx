@@ -44,7 +44,7 @@ export default function Navbar() {
     return () => {
       window.removeEventListener("user-state-changed", syncUser);
     };
-  }, []);
+  }, [pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem("consumer_user");
