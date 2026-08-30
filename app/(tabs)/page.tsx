@@ -1,28 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Sparkles, Truck, Shield, Clock } from "lucide-react";
-import { supabase, supabaseAdmin } from "@/lib/supabase";
-import { Dress } from "@/types";
+import FeaturedDresses from "@/components/FeaturedDresses";
 
-export const dynamic = "force-dynamic";
-
-async function getFeaturedDresses() {
-  const database = supabaseAdmin || supabase;
-  if (!database) return [];
-
-  const { data } = await database
-    .from("dresses")
-    .select("*")
-    .eq("featured", true)
-    .eq("available", true)
-    .order("created_at", { ascending: false })
-    .limit(4);
-
-  return (data || []) as Dress[];
-}
-
-export default async function HomePage() {
-  const featuredDresses = await getFeaturedDresses();
+export default function HomePage() {
 
   return (
     <div className="space-y-20 pb-20">
@@ -121,28 +102,7 @@ export default async function HomePage() {
             View All <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featuredDresses.map((dress) => (
-            <div key={dress.name} className="group bg-white rounded-2xl border border-secondary-200 overflow-hidden hover:shadow-xl transition-all">
-              <div className="relative aspect-[3/4] overflow-hidden">
-                <Image
-                  src={dress.image}
-                  alt={dress.name}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                  className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                />
-                <span className="absolute top-3 right-3 px-3 py-1 bg-white/90 backdrop-blur-sm rounded-full text-xs font-semibold">
-                  {dress.category}
-                </span>
-              </div>
-              <div className="p-4">
-                <h3 className="font-semibold text-secondary-900">{dress.name}</h3>
-                <p className="text-primary-600 font-bold mt-1">₱{dress.price}<span className="text-sm text-secondary-400 font-normal">/day</span></p>
-              </div>
-            </div>
-          ))}
-        </div>
+        <FeaturedDresses />
       </section>
 
       {/* CTA Section */}
