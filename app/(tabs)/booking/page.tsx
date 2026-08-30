@@ -92,8 +92,11 @@ function BookingPageContent() {
     setEndDate(addDays(startDate, rentalDays - 1));
   }, [startDate, extraDays]);
 
-  const totalPrice = selectedDress && startDate && endDate
-    ? calculateTotalPrice(selectedDress.price, startDate.toISOString(), endDate.toISOString())
+  const BASE_RENTAL_PRICE = 600;
+  const EXTRA_DAY_PRICE = 150;
+
+  const totalPrice = startDate && endDate
+    ? BASE_RENTAL_PRICE + extraDays * EXTRA_DAY_PRICE
     : 0;
 
   const hasBookingConflict = Boolean(
@@ -251,7 +254,7 @@ function BookingPageContent() {
               <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm font-medium text-secondary-700">Rental Length</p>
-                  <p className="text-xs text-secondary-500">Base rental: 3 days. Add optional extra days if needed.</p>
+                  <p className="text-xs text-secondary-500">Base rental: 3 days for ₱600. Extra day: ₱150.</p>
                 </div>
                 <label className="flex items-center gap-2 text-sm text-secondary-700">
                   <span>Extra days</span>
@@ -283,8 +286,11 @@ function BookingPageContent() {
                     {format(startDate, "MMM d, yyyy")} - {format(endDate, "MMM d, yyyy")}
                   </p>
                   <p className="text-sm text-secondary-600 mt-1">
-                    <span className="font-semibold">Total:</span>{" "}
+                    <span className="font-semibold">Price:</span>{" "}
                     <span className="text-primary-600 font-bold">{formatPrice(totalPrice)}</span>
+                    <span className="ml-2 text-xs text-secondary-500">
+                      ({formatPrice(BASE_RENTAL_PRICE)} base + {extraDays} extra day{extraDays === 1 ? "" : "s"} @ {formatPrice(EXTRA_DAY_PRICE)})
+                    </span>
                   </p>
                 </div>
               )}
