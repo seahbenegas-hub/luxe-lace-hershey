@@ -68,7 +68,7 @@ export default function DressCard({ dress }: DressCardProps) {
               {formatPrice(dress.price)}
             </div>
             <div className="text-xs text-secondary-400">3-day rent fee</div>
-            <div className="text-[11px] text-secondary-500">+ {formatPrice(0)} / add'l day</div>
+            <div className="text-[11px] text-secondary-500">+ {formatPrice(dress.additionalDayPrice ?? 0)} / add'l day</div>
           </div>
           <Link
             href={`/booking?dress=${dress.id}`}

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Dress } from "@/types";
+import { formatPrice } from "@/lib/utils";
 
 export default function FeaturedDresses() {
   const [dresses, setDresses] = useState<Dress[]>([]);
@@ -32,8 +33,8 @@ export default function FeaturedDresses() {
           </div>
           <div className="p-4">
             <h3 className="font-semibold text-secondary-900">{dress.name}</h3>
-            <p className="text-primary-600 font-bold mt-1">{dress.price ? `₱${dress.price}` : "₱0"}</p>
-            <p className="text-xs text-secondary-500">3-day rent fee + ₱0 / add'l day</p>
+            <p className="text-primary-600 font-bold mt-1">{formatPrice(dress.price)}</p>
+            <p className="text-xs text-secondary-500">3-day rent fee + {formatPrice(dress.additionalDayPrice ?? 0)} / add'l day</p>
           </div>
         </div>
       ))}

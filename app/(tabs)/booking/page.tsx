@@ -93,7 +93,7 @@ function BookingPageContent() {
   }, [startDate, extraDays]);
 
   const BASE_RENTAL_PRICE = selectedDress ? selectedDress.price : 0;
-  const EXTRA_DAY_PRICE = 0;
+  const EXTRA_DAY_PRICE = selectedDress ? selectedDress.additionalDayPrice ?? 0 : 0;
 
   const totalPrice = startDate && endDate
     ? BASE_RENTAL_PRICE + extraDays * EXTRA_DAY_PRICE
@@ -243,7 +243,7 @@ function BookingPageContent() {
                   </div>
                   <p className="font-medium text-sm text-secondary-900 line-clamp-1">{dress.name}</p>
                   <p className="text-primary-600 text-sm font-semibold">3-Day Rent Fee: {formatPrice(dress.price)}</p>
-                  <p className="text-secondary-500 text-xs">Additional day: {formatPrice(0)}</p>
+                  <p className="text-secondary-500 text-xs">Additional day: {formatPrice(dress.additionalDayPrice ?? 0)}</p>
                 </button>
               ))}
             </div>
@@ -255,7 +255,7 @@ function BookingPageContent() {
               <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm font-medium text-secondary-700">Rental Length</p>
-                  <p className="text-xs text-secondary-500">3-Day Rent Fee: {formatPrice(selectedDress.price)}. Additional day: {formatPrice(0)}.</p>
+                  <p className="text-xs text-secondary-500">3-Day Rent Fee: {formatPrice(selectedDress.price)}. Additional day: {formatPrice(selectedDress.additionalDayPrice ?? 0)}.</p>
                 </div>
                 <label className="flex items-center gap-2 text-sm text-secondary-700">
                   <span>Extra days</span>
