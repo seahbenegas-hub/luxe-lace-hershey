@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import GoogleSignIn from "@/components/GoogleSignIn";
-import { ArrowRight, Mail } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function ConsumerSignInPage() {
   const router = useRouter();
@@ -34,24 +34,13 @@ export default function ConsumerSignInPage() {
             />
           </div>
 
-          {/* Divider */}
-          <div className="flex items-center gap-3">
-            <div className="flex-1 h-px bg-secondary-200"></div>
-            <span className="text-xs text-secondary-400 font-medium">OR</span>
-            <div className="flex-1 h-px bg-secondary-200"></div>
-          </div>
-
-          {/* Email Alternative */}
-          <div className="space-y-3">
-            <p className="text-sm text-secondary-600 text-center font-medium">Continue without account</p>
-            <button
-              onClick={() => router.push("/booking")}
-              className="w-full py-3 bg-secondary-100 text-secondary-900 rounded-xl font-semibold hover:bg-secondary-200 transition-colors flex items-center justify-center gap-2"
-            >
-              <Mail className="w-4 h-4" />
-              Continue with Email
-            </button>
-          </div>
+          <button
+            onClick={() => router.push("/booking")}
+            className="w-full py-3 bg-secondary-100 text-secondary-900 rounded-xl font-semibold hover:bg-secondary-200 transition-colors flex items-center justify-center gap-2"
+          >
+            <span>Continue without account</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Footer Info */}
