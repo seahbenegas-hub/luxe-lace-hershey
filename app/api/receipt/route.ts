@@ -15,15 +15,21 @@ export async function POST(request: Request) {
 
     if (supabaseAdmin) {
       const { data, error } = await supabaseAdmin.storage
-        .from("receipts")
+        .from("Receipts")
         .upload(path, file, {
           contentType: file.type || "application/octet-stream",
           upsert: true,
         });
 
+      if (error) {
+        console.error("Supabase storage upload error:", error);
+        console.error("Upload path:", path);
+        console.error("File type:", file.type);
+      }
+
       if (!error && data) {
         const { data: publicUrlData } = supabaseAdmin.storage
-          .from("receipts")
+          .from("Receipts")
           .getPublicUrl(data.path);
 
         return NextResponse.json({

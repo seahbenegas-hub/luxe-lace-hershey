@@ -2,7 +2,7 @@ import { Dress, Booking, User } from "@/types";
 
 export const dresses: Dress[] = [
   {
-    id: "1",
+    id: "550e8400-e29b-41d4-a716-446655440001",
     name: "Elegant Evening Gown",
     description: "A stunning floor-length gown perfect for formal events and galas. Features a sweetheart neckline and flowing chiffon skirt.",
     price: 150,
@@ -14,7 +14,7 @@ export const dresses: Dress[] = [
     category: "Gowns"
   },
   {
-    id: "2",
+    id: "550e8400-e29b-41d4-a716-446655440002",
     name: "Cocktail Party Dress",
     description: "A chic knee-length dress with sequin details. Perfect for cocktail parties and semi-formal events.",
     price: 85,
@@ -26,7 +26,7 @@ export const dresses: Dress[] = [
     category: "Cocktail"
   },
   {
-    id: "3",
+    id: "550e8400-e29b-41d4-a716-446655440003",
     name: "Summer Floral Maxi",
     description: "Light and breezy maxi dress with beautiful floral prints. Ideal for beach weddings and garden parties.",
     price: 65,
@@ -38,7 +38,7 @@ export const dresses: Dress[] = [
     category: "Maxi"
   },
   {
-    id: "4",
+    id: "550e8400-e29b-41d4-a716-446655440004",
     name: "Red Carpet Glamour",
     description: "Show-stopping red gown with a dramatic train. Make an entrance at any high-profile event.",
     price: 200,
@@ -50,7 +50,7 @@ export const dresses: Dress[] = [
     category: "Gowns"
   },
   {
-    id: "5",
+    id: "550e8400-e29b-41d4-a716-446655440005",
     name: "Bridesmaid Chiffon",
     description: "Elegant chiffon dress in dusty rose. Perfect for bridesmaids or wedding guests.",
     price: 95,
@@ -62,7 +62,7 @@ export const dresses: Dress[] = [
     category: "Wedding"
   },
   {
-    id: "6",
+    id: "550e8400-e29b-41d4-a716-446655440006",
     name: "Vintage Lace Dress",
     description: "Romantic lace dress with vintage-inspired design. Features delicate sleeves and a fitted bodice.",
     price: 110,
@@ -74,7 +74,7 @@ export const dresses: Dress[] = [
     category: "Lace"
   },
   {
-    id: "7",
+    id: "550e8400-e29b-41d4-a716-446655440007",
     name: "Little Black Dress",
     description: "The classic LBD with a modern twist. Versatile and timeless for any occasion.",
     price: 55,
@@ -86,7 +86,7 @@ export const dresses: Dress[] = [
     category: "Casual"
   },
   {
-    id: "8",
+    id: "550e8400-e29b-41d4-a716-446655440008",
     name: "Prom Princess Gown",
     description: "Sparkling ball gown perfect for prom or quinceañera. Tulle skirt with crystal embellishments.",
     price: 180,
@@ -98,7 +98,7 @@ export const dresses: Dress[] = [
     category: "Gowns"
   },
   {
-    id: "9",
+    id: "550e8400-e29b-41d4-a716-446655440009",
     name: "Business Chic Sheath",
     description: "Professional sheath dress for corporate events and business dinners. Clean lines and sophisticated cut.",
     price: 75,
@@ -110,7 +110,7 @@ export const dresses: Dress[] = [
     category: "Business"
   },
   {
-    id: "10",
+    id: "550e8400-e29b-41d4-a716-446655440010",
     name: "Boho Festival Dress",
     description: "Free-spirited boho dress with embroidery details. Perfect for festivals and outdoor events.",
     price: 60,
@@ -122,7 +122,7 @@ export const dresses: Dress[] = [
     category: "Casual"
   },
   {
-    id: "11",
+    id: "550e8400-e29b-41d4-a716-446655440011",
     name: "Mermaid Wedding Dress",
     description: "Stunning mermaid silhouette wedding dress with lace appliqués. For the modern bride.",
     price: 250,
@@ -134,7 +134,7 @@ export const dresses: Dress[] = [
     category: "Wedding"
   },
   {
-    id: "12",
+    id: "550e8400-e29b-41d4-a716-446655440012",
     name: "Velvet Holiday Dress",
     description: "Luxurious velvet dress in emerald green. Perfect for holiday parties and winter events.",
     price: 120,
