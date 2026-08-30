@@ -684,6 +684,7 @@ export default function AdminPage() {
                     <th className="text-left py-3 px-4 font-medium text-secondary-500">Size</th>
                     <th className="text-left py-3 px-4 font-medium text-secondary-500">Image</th>
                     <th className="text-left py-3 px-4 font-medium text-secondary-500">3-Day Rent Fee</th>
+                    <th className="text-left py-3 px-4 font-medium text-secondary-500">Add'l Day</th>
                     <th className="text-left py-3 px-4 font-medium text-secondary-500">Featured</th>
                     <th className="text-left py-3 px-4 font-medium text-secondary-500">Status</th>
                     <th className="text-left py-3 px-4 font-medium text-secondary-500">Actions</th>
@@ -748,11 +749,11 @@ export default function AdminPage() {
                               className="w-24 p-2 border border-secondary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                             />
                           ) : (
-                            <div className="flex flex-col">
-                              <span>{formatPrice(dress.price * 3)}</span>
-                              <span className="text-xs text-secondary-500">+ {formatPrice(dress.price)} / add'l day</span>
-                            </div>
+                            formatPrice(dress.price * 3)
                           )}
+                        </td>
+                        <td className="py-3 px-4 font-medium text-secondary-700">
+                          {formatPrice(dress.price)}
                         </td>
                         <td className="py-3 px-4">
                           {isEditing ? (
