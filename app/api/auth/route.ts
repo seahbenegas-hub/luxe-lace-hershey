@@ -1,9 +1,28 @@
 import { NextResponse } from "next/server";
 import { users } from "@/lib/db";
-import { createToken } from "@/lib/auth";
+import { createToken, verifyToken } from "@/lib/auth";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@rentaldress.com";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin123";
+
+export async function GET(request: Request) {
+  const authHeader = request.headers.get("authorization") || "";
+  const tokenFromHeader = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  const tokenFromQuery = new URL(request.url).searchParams.get("token");
+  const token = tokenFromHeader || tokenFromQuery;
+
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const user = await verifyToken(token);
+
+  if (!user || user.role !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  return NextResponse.json({ user });
+}
 
 export async function POST(request: Request) {
   const { email, password } = await request.json();

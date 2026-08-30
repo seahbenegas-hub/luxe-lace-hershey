@@ -6,7 +6,7 @@ export async function GET() {
   if (supabase) {
     const { data, error } = await supabase.from("dresses").select("*").order("created_at", { ascending: false });
 
-    if (!error && data) {
+    if (!error && data && data.length > 0) {
       return NextResponse.json(data);
     }
   }

@@ -30,24 +30,54 @@ export default function AdminPage() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     const user = localStorage.getItem("user");
+
     if (!token || !user) {
       router.push("/admin/login");
       return;
     }
-    const parsed = JSON.parse(user);
-    if (parsed.role !== "admin") {
-      router.push("/");
-      return;
-    }
 
-    Promise.all([
-      fetch("/api/bookings").then((r) => r.json()),
-      fetch("/api/dresses").then((r) => r.json()),
-    ]).then(([b, d]) => {
-      setBookings(b);
-      setDresses(d);
-      setLoading(false);
-    });
+    const validateAccess = async () => {
+      try {
+        const res = await fetch("/api/auth", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          router.push("/admin/login");
+          return;
+        }
+
+        const payload = await res.json();
+        const parsed = JSON.parse(user);
+
+        if (payload.user?.role !== "admin" || parsed.role !== "admin") {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          router.push("/");
+          return;
+        }
+
+        Promise.all([
+          fetch("/api/bookings").then((r) => r.json()),
+          fetch("/api/dresses").then((r) => r.json()),
+        ]).then(([b, d]) => {
+          setBookings(b);
+          setDresses(d);
+          setLoading(false);
+        });
+      } catch {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        router.push("/admin/login");
+      }
+    };
+
+    validateAccess();
   }, [router]);
 
   const handleLogout = () => {
