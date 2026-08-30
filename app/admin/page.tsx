@@ -32,6 +32,7 @@ export default function AdminPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingDressId, setEditingDressId] = useState<string | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
+  const [inventoryError, setInventoryError] = useState("");
   const [editForm, setEditForm] = useState<{
     name: string;
     description: string;
@@ -156,6 +157,7 @@ export default function AdminPage() {
 
   const saveDressEdits = async () => {
     if (!editForm) return;
+    setInventoryError("");
 
     const payload = {
       ...(isAddingNew ? {} : { id: editingDressId }),
@@ -181,7 +183,8 @@ export default function AdminPage() {
     });
 
     if (!res.ok) {
-      console.error("Failed to save dress");
+      const result = await res.json().catch(() => null);
+      setInventoryError(result?.error || "Failed to save dress");
       return;
     }
 
@@ -201,6 +204,7 @@ export default function AdminPage() {
       return;
     }
 
+    setInventoryError("");
     const res = await fetch("/api/dresses", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
@@ -208,7 +212,8 @@ export default function AdminPage() {
     });
 
     if (!res.ok) {
-      console.error("Failed to delete dress");
+      const result = await res.json().catch(() => null);
+      setInventoryError(result?.error || "Failed to delete dress");
       return;
     }
 
@@ -499,6 +504,10 @@ export default function AdminPage() {
                 + Add Dress
               </button>
             </div>
+
+            {inventoryError && (
+              <p className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{inventoryError}</p>
+            )}
 
             {isAddingNew && editForm && (
               <div className="mb-6 rounded-xl border border-dashed border-primary-200 bg-primary-50 p-4 space-y-3">

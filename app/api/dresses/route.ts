@@ -21,6 +21,10 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: "Supabase service role key is not configured" }, { status: 503 });
+    }
+
     const body = await request.json();
     const draftDress = {
       id: body.id || crypto.randomUUID(),
@@ -35,18 +39,13 @@ export async function POST(request: Request) {
       category: body.category || "New",
     };
 
-    if (supabaseAdmin) {
-      const { data, error } = await supabaseAdmin.from("dresses").insert([draftDress]).select().single();
-      if (error) {
-        console.error("Supabase insert error:", error);
-        return NextResponse.json({ error: "Unable to save dress to Supabase" }, { status: 500 });
-      } else if (data) {
-        return NextResponse.json(data);
-      }
+    const { data, error } = await supabaseAdmin.from("dresses").insert([draftDress]).select().single();
+    if (error) {
+      console.error("Supabase insert error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    dresses.unshift(draftDress);
-    return NextResponse.json(draftDress);
+    return NextResponse.json(data);
   } catch (error) {
     console.error("Failed to create dress:", error);
     return NextResponse.json({ error: "Failed to create dress" }, { status: 500 });
@@ -55,6 +54,10 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: "Supabase service role key is not configured" }, { status: 503 });
+    }
+
     const { id, updates } = await request.json();
 
     if (!id || !updates) {
@@ -68,29 +71,19 @@ export async function PATCH(request: Request) {
         : {}),
     };
 
-    if (supabaseAdmin) {
-      const { data, error } = await supabaseAdmin
-        .from("dresses")
-        .update(normalizedUpdates)
-        .eq("id", id)
-        .select()
-        .single();
+    const { data, error } = await supabaseAdmin
+      .from("dresses")
+      .update(normalizedUpdates)
+      .eq("id", id)
+      .select()
+      .single();
 
-      if (!error && data) {
-        return NextResponse.json(data);
-      }
-
-      console.error("Supabase update error:", error);
-      return NextResponse.json({ error: "Unable to update dress in Supabase" }, { status: 500 });
+    if (!error && data) {
+      return NextResponse.json(data);
     }
 
-    const index = dresses.findIndex((dress) => dress.id === id);
-    if (index === -1) {
-      return NextResponse.json({ error: "Dress not found" }, { status: 404 });
-    }
-
-    dresses[index] = { ...dresses[index], ...normalizedUpdates };
-    return NextResponse.json(dresses[index]);
+    console.error("Supabase update error:", error);
+    return NextResponse.json({ error: error?.message || "Dress not found" }, { status: error ? 500 : 404 });
   } catch (error) {
     console.error("Failed to update dress:", error);
     return NextResponse.json({ error: "Failed to update dress" }, { status: 500 });
@@ -99,30 +92,24 @@ export async function PATCH(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    if (!supabaseAdmin) {
+      return NextResponse.json({ error: "Supabase service role key is not configured" }, { status: 503 });
+    }
+
     const { id } = await request.json();
 
     if (!id) {
       return NextResponse.json({ error: "Missing dress id" }, { status: 400 });
     }
 
-    if (supabaseAdmin) {
-      const { error } = await supabaseAdmin.from("dresses").delete().eq("id", id);
+    const { error } = await supabaseAdmin.from("dresses").delete().eq("id", id);
 
-      if (!error) {
-        return NextResponse.json({ success: true });
-      }
-
-      console.error("Supabase delete error:", error);
-      return NextResponse.json({ error: "Unable to delete dress from Supabase" }, { status: 500 });
+    if (!error) {
+      return NextResponse.json({ success: true });
     }
 
-    const index = dresses.findIndex((dress) => dress.id === id);
-    if (index === -1) {
-      return NextResponse.json({ error: "Dress not found" }, { status: 404 });
-    }
-
-    dresses.splice(index, 1);
-    return NextResponse.json({ success: true });
+    console.error("Supabase delete error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   } catch (error) {
     console.error("Failed to delete dress:", error);
     return NextResponse.json({ error: "Failed to delete dress" }, { status: 500 });
