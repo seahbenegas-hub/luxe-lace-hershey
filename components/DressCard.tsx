@@ -19,6 +19,8 @@ export default function DressCard({ dress }: DressCardProps) {
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const dragRef = useRef<{ startX: number; startY: number; originX: number; originY: number } | null>(null);
+  const swipeRef = useRef<{ startX: number } | null>(null);
+  const doubleTapRef = useRef<number | null>(null);
 
   const selectedPreviewImage = imageList[selectedIndex] || imageList[0];
 
@@ -30,16 +32,6 @@ export default function DressCard({ dress }: DressCardProps) {
     setImageSrc(imageList[index]);
     setPan({ x: 0, y: 0 });
     setZoom(1);
-  };
-
-  const goToNext = () => {
-    if (imageList.length <= 1) return;
-    updatePreviewImage(selectedIndex + 1);
-  };
-
-  const goToPrevious = () => {
-    if (imageList.length <= 1) return;
-    updatePreviewImage(selectedIndex - 1);
   };
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -68,6 +60,40 @@ export default function DressCard({ dress }: DressCardProps) {
     dragRef.current = null;
   };
 
+  const handleSwipeStart = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (zoom > 1) return;
+    swipeRef.current = { startX: e.clientX };
+  };
+
+  const handleSwipeEnd = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (!swipeRef.current || zoom > 1) return;
+    const endX = e.clientX;
+    const diff = swipeRef.current.startX - endX;
+    if (Math.abs(diff) > 50 && imageList.length > 1) {
+      if (diff > 0) {
+        updatePreviewImage(selectedIndex + 1);
+      } else {
+        updatePreviewImage(selectedIndex - 1);
+      }
+    }
+    swipeRef.current = null;
+  };
+
+  const handleDoubleTap = () => {
+    const now = Date.now();
+    if (doubleTapRef.current && now - doubleTapRef.current < 300) {
+      if (zoom === 1) {
+        setZoom(2);
+      } else {
+        setZoom(1);
+        setPan({ x: 0, y: 0 });
+      }
+      doubleTapRef.current = null;
+    } else {
+      doubleTapRef.current = now;
+    }
+  };
+
   useEffect(() => {
     const nextIndex = 0;
     setSelectedIndex(nextIndex);
@@ -85,7 +111,11 @@ export default function DressCard({ dress }: DressCardProps) {
 
     if (isPreviewOpen) {
       document.addEventListener("keydown", handleEscKey);
-      return () => document.removeEventListener("keydown", handleEscKey);
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.removeEventListener("keydown", handleEscKey);
+        document.body.style.overflow = "unset";
+      };
     }
   }, [isPreviewOpen]);
 
@@ -167,54 +197,39 @@ export default function DressCard({ dress }: DressCardProps) {
       </div>
 
       {isPreviewOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 sm:p-6">
-          <div className="relative w-full max-w-5xl rounded-2xl bg-white p-3 shadow-2xl overflow-hidden">
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/85 p-0 sm:p-4">
+          <div className="relative w-full h-full sm:h-auto sm:max-w-5xl sm:max-h-[90vh] sm:rounded-2xl bg-white overflow-hidden flex flex-col">
+            {/* Close Button */}
             <button
               type="button"
               onClick={() => setIsPreviewOpen(false)}
-              className="absolute top-2 right-2 z-10 rounded-full bg-white border-2 border-secondary-200 p-2 text-secondary-800 hover:bg-secondary-100 transition-colors"
+              className="absolute top-3 right-3 sm:top-2 sm:right-2 z-10 rounded-full bg-white border-2 border-secondary-200 p-2 sm:p-3 text-secondary-800 hover:bg-secondary-100 active:bg-secondary-200 transition-all active:scale-90"
               aria-label="Close preview"
             >
-              <X className="w-6 h-6" />
+              <X className="w-6 h-6 sm:w-7 sm:h-7" />
             </button>
 
-            <div className="relative overflow-hidden rounded-xl bg-secondary-100">
-              <div className="flex items-center justify-center gap-2 border-b border-secondary-200 bg-white/80 px-2 py-2 backdrop-blur-sm">
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setZoom((value) => Number(Math.max(1, Number((value - 0.25).toFixed(2)))))}
-                    className="rounded-full bg-white/80 px-2 py-1 text-sm font-semibold text-secondary-800 hover:bg-white"
-                    aria-label="Zoom out"
-                  >
-                    −
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setZoom((value) => Number(Math.min(2.5, Number((value + 0.25).toFixed(2)))))}
-                    className="rounded-full bg-white/80 px-2 py-1 text-sm font-semibold text-secondary-800 hover:bg-white"
-                    aria-label="Zoom in"
-                  >
-                    +
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setZoom(1);
-                      setPan({ x: 0, y: 0 });
-                    }}
-                    className="rounded-full bg-white/80 px-2 py-1 text-xs font-semibold text-secondary-800 hover:bg-white"
-                  >
-                    Reset
-                  </button>
-                </div>
+            {/* Image Counter */}
+            {imageList.length > 1 && (
+              <div className="absolute top-3 left-3 z-20 px-3 py-1 bg-black/60 rounded-full text-xs sm:text-sm font-semibold text-white">
+                {selectedIndex + 1} / {imageList.length}
               </div>
+            )}
 
+            {/* Main Image Viewer */}
+            <div className="relative flex-1 overflow-hidden bg-secondary-100">
               <div
-                className="relative flex max-h-[72vh] cursor-grab touch-pan-y items-center justify-center overflow-hidden bg-secondary-100 p-2"
-                onPointerDown={handlePointerDown}
+                className="relative w-full h-full flex items-center justify-center overflow-hidden bg-secondary-100 cursor-grab active:cursor-grabbing touch-none"
+                onPointerDown={(e) => {
+                  handlePointerDown(e);
+                  handleSwipeStart(e);
+                  handleDoubleTap();
+                }}
                 onPointerMove={handlePointerMove}
-                onPointerUp={handlePointerUp}
+                onPointerUp={(e) => {
+                  handlePointerUp();
+                  handleSwipeEnd(e);
+                }}
                 onPointerLeave={handlePointerUp}
                 style={{ cursor: zoom > 1 ? "grab" : "default" }}
               >
@@ -226,22 +241,91 @@ export default function DressCard({ dress }: DressCardProps) {
                     transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
                     transition: zoom > 1 ? "none" : "transform 0.2s ease",
                   }}
-                  className="max-h-[68vh] w-full object-contain select-none"
+                  className="max-h-full max-w-full object-contain select-none"
                 />
+              </div>
+
+              {/* Desktop Zoom Controls */}
+              <div className="hidden sm:flex absolute bottom-3 left-1/2 transform -translate-x-1/2 items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-3 py-2 border border-secondary-200">
+                <button
+                  type="button"
+                  onClick={() => setZoom((value) => Number(Math.max(1, Number((value - 0.25).toFixed(2)))))}
+                  className="rounded-full bg-white px-3 py-2 text-sm font-semibold text-secondary-800 hover:bg-secondary-100 active:bg-secondary-200 transition-colors"
+                  aria-label="Zoom out"
+                >
+                  −
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setZoom((value) => Number(Math.min(2.5, Number((value + 0.25).toFixed(2)))))}
+                  className="rounded-full bg-white px-3 py-2 text-sm font-semibold text-secondary-800 hover:bg-secondary-100 active:bg-secondary-200 transition-colors"
+                  aria-label="Zoom in"
+                >
+                  +
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setZoom(1);
+                    setPan({ x: 0, y: 0 });
+                  }}
+                  className="rounded-full bg-white px-3 py-2 text-xs font-semibold text-secondary-800 hover:bg-secondary-100 active:bg-secondary-200 transition-colors"
+                >
+                  Reset
+                </button>
+              </div>
+
+              {/* Mobile Zoom Controls */}
+              <div className="sm:hidden absolute bottom-3 left-1/2 transform -translate-x-1/2 flex items-center gap-2 bg-black/60 backdrop-blur-sm rounded-full px-2 py-1.5">
+                <button
+                  type="button"
+                  onClick={() => setZoom((value) => Number(Math.max(1, Number((value - 0.25).toFixed(2)))))}
+                  className="rounded-full bg-white/80 px-2.5 py-1.5 text-sm font-semibold text-secondary-800 active:bg-secondary-200 transition-colors"
+                  aria-label="Zoom out"
+                >
+                  −
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setZoom((value) => Number(Math.min(2.5, Number((value + 0.25).toFixed(2)))))}
+                  className="rounded-full bg-white/80 px-2.5 py-1.5 text-sm font-semibold text-secondary-800 active:bg-secondary-200 transition-colors"
+                  aria-label="Zoom in"
+                >
+                  +
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setZoom(1);
+                    setPan({ x: 0, y: 0 });
+                  }}
+                  className="rounded-full bg-white/80 px-2 py-1.5 text-xs font-semibold text-secondary-800 active:bg-secondary-200 transition-colors"
+                >
+                  Reset
+                </button>
               </div>
             </div>
 
+            {/* Thumbnail Strip */}
             {imageList.length > 1 && (
-              <div className="sticky bottom-0 mt-3 rounded-xl border border-secondary-200 bg-white/90 p-2 backdrop-blur-sm">
-                <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+              <div className="border-t border-secondary-200 bg-white/95 backdrop-blur-sm p-2 sm:p-3">
+                <div className="flex gap-2 overflow-x-auto pb-1">
                   {imageList.map((photo, index) => (
                     <button
                       key={`${dress.id}-${index}`}
                       type="button"
                       onClick={() => updatePreviewImage(index)}
-                      className={`overflow-hidden rounded-lg border-2 ${selectedIndex === index ? "border-primary-500" : "border-transparent"}`}
+                      className={`flex-shrink-0 rounded-lg border-2 transition-all active:scale-95 ${
+                        selectedIndex === index
+                          ? "border-primary-500 ring-2 ring-primary-300"
+                          : "border-secondary-300 hover:border-secondary-400"
+                      }`}
                     >
-                      <img src={photo} alt={`${dress.name} photo ${index + 1}`} className="h-20 w-full object-cover" />
+                      <img
+                        src={photo}
+                        alt={`${dress.name} photo ${index + 1}`}
+                        className="h-14 w-14 sm:h-16 sm:w-16 object-cover rounded"
+                      />
                     </button>
                   ))}
                 </div>
