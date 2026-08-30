@@ -5,8 +5,10 @@ import { supabase, supabaseAdmin } from "@/lib/supabase";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  if (supabase) {
-    const { data, error } = await supabase.from("dresses").select("*").order("created_at", { ascending: false });
+  const database = supabaseAdmin || supabase;
+
+  if (database) {
+    const { data, error } = await database.from("dresses").select("*").order("created_at", { ascending: false });
 
     if (error) {
       console.error("Supabase dress query error:", error);
