@@ -48,7 +48,7 @@ function BookingPageContent() {
   }, [dressId]);
 
   useEffect(() => {
-    const stored = localStorage.getItem("consumer_user") || localStorage.getItem("user");
+    const stored = localStorage.getItem("user");
     if (stored) {
       const user = JSON.parse(stored);
       setUserName(user.name || "");
@@ -111,12 +111,11 @@ function BookingPageContent() {
         return;
       }
 
-      // Store consumer info in local storage so My Rentals can fetch their bookings
-      localStorage.setItem("consumer_user", JSON.stringify({
+      // Store user info in localStorage so My Rentals can fetch their bookings
+      localStorage.setItem("user", JSON.stringify({
         email: userEmail,
         name: userName,
       }));
-      localStorage.removeItem("user");
 
       setStep("confirmed");
     } catch (err) {

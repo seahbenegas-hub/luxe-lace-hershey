@@ -18,41 +18,19 @@ const navLinks = [
 export default function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState<{ name?: string; email?: string; role?: string } | null>(null);
-
-  const syncUser = () => {
-    try {
-      const stored = localStorage.getItem("consumer_user") || localStorage.getItem("user");
-      setUser(stored ? JSON.parse(stored) : null);
-    } catch {
-      setUser(null);
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("consumer_user");
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    localStorage.removeItem("admin_token");
-    localStorage.removeItem("admin_user");
-    setUser(null);
-    window.dispatchEvent(new Event("user-updated"));
-    window.location.href = "/";
-  };
+  const [user, setUser] = useState<{ name: string; role: string } | null>(null);
 
   useEffect(() => {
-    syncUser();
-
-    const handleUserUpdate = () => syncUser();
-    window.addEventListener("user-updated", handleUserUpdate);
-    window.addEventListener("storage", handleUserUpdate);
-
-    return () => {
-      window.removeEventListener("user-updated", handleUserUpdate);
-      window.removeEventListener("storage", handleUserUpdate);
-    };
+    const stored = localStorage.getItem("user");
+    if (stored) setUser(JSON.parse(stored));
   }, []);
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    setUser(null);
+    window.location.href = "/";
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-secondary-200">

@@ -28,8 +28,8 @@ export default function AdminPage() {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    const token = localStorage.getItem("admin_token") || localStorage.getItem("token");
-    const user = localStorage.getItem("admin_user") || localStorage.getItem("user");
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
 
     if (!token || !user) {
       router.push("/admin/login");
@@ -46,8 +46,6 @@ export default function AdminPage() {
         });
 
         if (!res.ok) {
-          localStorage.removeItem("admin_token");
-          localStorage.removeItem("admin_user");
           localStorage.removeItem("token");
           localStorage.removeItem("user");
           router.push("/admin/login");
@@ -58,8 +56,6 @@ export default function AdminPage() {
         const parsed = JSON.parse(user);
 
         if (payload.user?.role !== "admin" || parsed.role !== "admin") {
-          localStorage.removeItem("admin_token");
-          localStorage.removeItem("admin_user");
           localStorage.removeItem("token");
           localStorage.removeItem("user");
           router.push("/");
@@ -75,8 +71,6 @@ export default function AdminPage() {
           setLoading(false);
         });
       } catch {
-        localStorage.removeItem("admin_token");
-        localStorage.removeItem("admin_user");
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         router.push("/admin/login");
@@ -87,8 +81,6 @@ export default function AdminPage() {
   }, [router]);
 
   const handleLogout = () => {
-    localStorage.removeItem("admin_token");
-    localStorage.removeItem("admin_user");
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     router.push("/admin/login");

@@ -21,16 +21,12 @@ export default function GoogleSignIn({ onSuccess, onError }: GoogleSignInProps) 
       const email = decoded.email;
       const name = decoded.name;
 
-      const userData = {
+      // Store in localStorage for booking flow
+      localStorage.setItem("user", JSON.stringify({
         email,
         name,
         googleId: decoded.sub,
-      };
-
-      // Store in localStorage for consumer booking flow
-      localStorage.setItem("consumer_user", JSON.stringify(userData));
-      localStorage.removeItem("user");
-      window.dispatchEvent(new Event("user-updated"));
+      }));
 
       if (onSuccess) {
         onSuccess(email, name);
