@@ -594,7 +594,7 @@ export default function AdminPage() {
                     {imageUploading ? "Uploading image..." : "Upload dress photo"}
                     <input
                       type="file"
-                      accept="image/*"
+                      accept="image/*,.heic,.heif"
                       disabled={imageUploading}
                       onChange={(e) => {
                         const file = e.target.files?.[0];
