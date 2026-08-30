@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { users } from "@/lib/db";
 import { createToken, verifyToken } from "@/lib/auth";
+import type { User } from "@/types";
 import { clientKey, rateLimit } from "@/lib/security";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
@@ -38,18 +38,22 @@ export async function POST(request: Request) {
   const email = typeof body?.email === "string" ? body.email.trim() : "";
   const password = typeof body?.password === "string" ? body.password : "";
 
-  const user = users.find((u) => u.email === email);
-
   const isValidAdmin =
     typeof email === "string" &&
     typeof password === "string" &&
     email.toLowerCase() === ADMIN_EMAIL.toLowerCase() &&
     password === ADMIN_PASSWORD;
 
-  if (!isValidAdmin || !user) {
+  if (!isValidAdmin) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
+  const user: User = {
+    id: "admin",
+    email: ADMIN_EMAIL,
+    name: "Administrator",
+    role: "admin",
+  };
   const token = await createToken(user);
   const response = NextResponse.json({ token, user });
   response.cookies.set("admin_token", token, {
