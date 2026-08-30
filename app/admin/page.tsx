@@ -20,6 +20,7 @@ import {
   Edit3,
   Save,
   X,
+  Trash2,
 } from "lucide-react";
 
 export default function AdminPage() {
@@ -193,6 +194,25 @@ export default function AdminPage() {
     }
 
     cancelEditDress();
+  };
+
+  const deleteDress = async (dressId: string) => {
+    if (!confirm("Are you sure you want to delete this dress?")) {
+      return;
+    }
+
+    const res = await fetch("/api/dresses", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: dressId }),
+    });
+
+    if (!res.ok) {
+      console.error("Failed to delete dress");
+      return;
+    }
+
+    setDresses((prev) => prev.filter((dress) => dress.id !== dressId));
   };
 
   const updateBookingStatus = async (id: string, status: string) => {
@@ -614,12 +634,20 @@ export default function AdminPage() {
                               </button>
                             </div>
                           ) : (
-                            <button
-                              onClick={() => beginEditDress(dress)}
-                              className="inline-flex items-center gap-1 px-2 py-1 bg-primary-50 text-primary-700 rounded text-xs font-medium hover:bg-primary-100"
-                            >
-                              <Edit3 className="w-3 h-3" /> Edit
-                            </button>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => beginEditDress(dress)}
+                                className="inline-flex items-center gap-1 px-2 py-1 bg-primary-50 text-primary-700 rounded text-xs font-medium hover:bg-primary-100"
+                              >
+                                <Edit3 className="w-3 h-3" /> Edit
+                              </button>
+                              <button
+                                onClick={() => deleteDress(dress.id)}
+                                className="inline-flex items-center gap-1 px-2 py-1 bg-red-50 text-red-700 rounded text-xs font-medium hover:bg-red-100"
+                              >
+                                <Trash2 className="w-3 h-3" /> Delete
+                              </button>
+                            </div>
                           )}
                         </td>
                       </tr>

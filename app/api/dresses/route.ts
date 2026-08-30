@@ -85,3 +85,32 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Failed to update dress" }, { status: 500 });
   }
 }
+
+export async function DELETE(request: Request) {
+  try {
+    const { id } = await request.json();
+
+    if (!id) {
+      return NextResponse.json({ error: "Missing dress id" }, { status: 400 });
+    }
+
+    if (supabaseAdmin) {
+      const { error } = await supabaseAdmin.from("dresses").delete().eq("id", id);
+
+      if (!error) {
+        return NextResponse.json({ success: true });
+      }
+    }
+
+    const index = dresses.findIndex((dress) => dress.id === id);
+    if (index === -1) {
+      return NextResponse.json({ error: "Dress not found" }, { status: 404 });
+    }
+
+    dresses.splice(index, 1);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Failed to delete dress:", error);
+    return NextResponse.json({ error: "Failed to delete dress" }, { status: 500 });
+  }
+}
