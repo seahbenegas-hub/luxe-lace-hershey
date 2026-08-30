@@ -12,7 +12,7 @@ export default function CatalogPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/dresses")
+    fetch("/api/dresses", { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
         setDresses(data);

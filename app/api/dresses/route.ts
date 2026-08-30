@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { dresses } from "@/lib/db";
 import { supabase, supabaseAdmin } from "@/lib/supabase";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   if (supabase) {
     const { data, error } = await supabase.from("dresses").select("*").order("created_at", { ascending: false });
@@ -12,11 +14,15 @@ export async function GET() {
     }
 
     if (data) {
-      return NextResponse.json(data);
+      return NextResponse.json(data, {
+        headers: { "Cache-Control": "no-store, max-age=0" },
+      });
     }
   }
 
-  return NextResponse.json(dresses);
+  return NextResponse.json(dresses, {
+    headers: { "Cache-Control": "no-store, max-age=0" },
+  });
 }
 
 export async function POST(request: Request) {

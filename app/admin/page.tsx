@@ -80,8 +80,8 @@ export default function AdminPage() {
         }
 
         Promise.all([
-          fetch("/api/bookings").then((r) => r.json()),
-          fetch("/api/dresses").then((r) => r.json()),
+          fetch("/api/bookings", { cache: "no-store" }).then((r) => r.json()),
+          fetch("/api/dresses", { cache: "no-store" }).then((r) => r.json()),
         ]).then(([b, d]) => {
           setBookings(b);
           setDresses(d);
@@ -107,8 +107,8 @@ export default function AdminPage() {
     setLoading(true);
     try {
       const [bookingsData, dressesData] = await Promise.all([
-        fetch("/api/bookings").then((r) => r.json()),
-        fetch("/api/dresses").then((r) => r.json()),
+        fetch("/api/bookings", { cache: "no-store" }).then((r) => r.json()),
+        fetch("/api/dresses", { cache: "no-store" }).then((r) => r.json()),
       ]);
       setBookings(bookingsData);
       setDresses(dressesData);
