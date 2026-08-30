@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Dress } from "@/types";
@@ -14,13 +14,66 @@ interface DressCardProps {
 export default function DressCard({ dress }: DressCardProps) {
   const imageList = dress.images && dress.images.length > 0 ? dress.images : [dress.image];
   const [imageSrc, setImageSrc] = useState(imageList[0]);
-  const [selectedPreviewImage, setSelectedPreviewImage] = useState(imageList[0]);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const dragRef = useRef<{ startX: number; startY: number; originX: number; originY: number } | null>(null);
+
+  const selectedPreviewImage = imageList[selectedIndex] || imageList[0];
+
+  const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
+
+  const updatePreviewImage = (nextIndex: number) => {
+    const index = clamp(nextIndex, 0, imageList.length - 1);
+    setSelectedIndex(index);
+    setImageSrc(imageList[index]);
+    setPan({ x: 0, y: 0 });
+    setZoom(1);
+  };
+
+  const goToNext = () => {
+    if (imageList.length <= 1) return;
+    updatePreviewImage(selectedIndex + 1);
+  };
+
+  const goToPrevious = () => {
+    if (imageList.length <= 1) return;
+    updatePreviewImage(selectedIndex - 1);
+  };
+
+  const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (zoom <= 1) return;
+    dragRef.current = {
+      startX: event.clientX,
+      startY: event.clientY,
+      originX: pan.x,
+      originY: pan.y,
+    };
+  };
+
+  const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!dragRef.current || zoom <= 1) return;
+
+    const dx = event.clientX - dragRef.current.startX;
+    const dy = event.clientY - dragRef.current.startY;
+
+    setPan({
+      x: clamp(dragRef.current.originX + dx, -180, 180),
+      y: clamp(dragRef.current.originY + dy, -180, 180),
+    });
+  };
+
+  const handlePointerUp = () => {
+    dragRef.current = null;
+  };
 
   useEffect(() => {
-    const nextImage = imageList[0];
-    setImageSrc(nextImage);
-    setSelectedPreviewImage(nextImage);
+    const nextIndex = 0;
+    setSelectedIndex(nextIndex);
+    setImageSrc(imageList[nextIndex]);
+    setPan({ x: 0, y: 0 });
+    setZoom(1);
   }, [dress.id, dress.image, dress.images]);
 
   return (
@@ -112,28 +165,91 @@ export default function DressCard({ dress }: DressCardProps) {
             </button>
 
             <div className="relative overflow-hidden rounded-xl bg-secondary-100">
-              <img
-                src={selectedPreviewImage}
-                alt={dress.name}
-                className="max-h-[72vh] w-full object-contain"
-              />
+              <div className="flex items-center justify-between gap-2 border-b border-secondary-200 bg-white/80 px-2 py-2 backdrop-blur-sm">
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={goToPrevious}
+                    disabled={imageList.length <= 1}
+                    className="rounded-full bg-secondary-900 px-3 py-1.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    ← Prev
+                  </button>
+                  <button
+                    type="button"
+                    onClick={goToNext}
+                    disabled={imageList.length <= 1}
+                    className="rounded-full bg-secondary-900 px-3 py-1.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Next →
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setZoom((value) => Number(Math.max(1, Number((value - 0.25).toFixed(2)))))}
+                    className="rounded-full bg-white/80 px-2 py-1 text-sm font-semibold text-secondary-800 hover:bg-white"
+                    aria-label="Zoom out"
+                  >
+                    −
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setZoom((value) => Number(Math.min(2.5, Number((value + 0.25).toFixed(2)))))}
+                    className="rounded-full bg-white/80 px-2 py-1 text-sm font-semibold text-secondary-800 hover:bg-white"
+                    aria-label="Zoom in"
+                  >
+                    +
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setZoom(1);
+                      setPan({ x: 0, y: 0 });
+                    }}
+                    className="rounded-full bg-white/80 px-2 py-1 text-xs font-semibold text-secondary-800 hover:bg-white"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </div>
+
+              <div
+                className="relative flex max-h-[72vh] cursor-grab touch-pan-y items-center justify-center overflow-hidden bg-secondary-100 p-2"
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerLeave={handlePointerUp}
+                style={{ cursor: zoom > 1 ? "grab" : "default" }}
+              >
+                <img
+                  src={selectedPreviewImage}
+                  alt={dress.name}
+                  draggable={false}
+                  style={{
+                    transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+                    transition: zoom > 1 ? "none" : "transform 0.2s ease",
+                  }}
+                  className="max-h-[68vh] w-full object-contain select-none"
+                />
+              </div>
             </div>
 
             {imageList.length > 1 && (
-              <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6">
-                {imageList.map((photo, index) => (
-                  <button
-                    key={`${dress.id}-${index}`}
-                    type="button"
-                    onClick={() => {
-                      setImageSrc(photo);
-                      setSelectedPreviewImage(photo);
-                    }}
-                    className={`overflow-hidden rounded-lg border-2 ${selectedPreviewImage === photo ? "border-primary-500" : "border-transparent"}`}
-                  >
-                    <img src={photo} alt={`${dress.name} photo ${index + 1}`} className="h-20 w-full object-cover" />
-                  </button>
-                ))}
+              <div className="sticky bottom-0 mt-3 rounded-xl border border-secondary-200 bg-white/90 p-2 backdrop-blur-sm">
+                <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+                  {imageList.map((photo, index) => (
+                    <button
+                      key={`${dress.id}-${index}`}
+                      type="button"
+                      onClick={() => updatePreviewImage(index)}
+                      className={`overflow-hidden rounded-lg border-2 ${selectedIndex === index ? "border-primary-500" : "border-transparent"}`}
+                    >
+                      <img src={photo} alt={`${dress.name} photo ${index + 1}`} className="h-20 w-full object-cover" />
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </div>

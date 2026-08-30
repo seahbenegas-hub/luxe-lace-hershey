@@ -687,7 +687,6 @@ export default function AdminPage() {
                     </label>
                   </div>
                   <input value={editForm.sizeText} onChange={(e) => setEditForm({ ...editForm, sizeText: e.target.value })} placeholder="Sizes: XS, S, M" className="md:col-span-2 p-2 border border-secondary-200 rounded-lg" />
-                  <input value={editForm.image} onChange={(e) => setEditForm({ ...editForm, image: e.target.value, images: [e.target.value, ...editForm.images.filter((url) => url !== e.target.value)].slice(0, 6) })} placeholder="Primary image URL" className="md:col-span-2 p-2 border border-secondary-200 rounded-lg" />
                   <label className="md:col-span-2 flex items-center gap-2 p-2 border border-secondary-200 rounded-lg bg-white text-sm text-secondary-600 cursor-pointer">
                     <Upload className="w-4 h-4" />
                     {imageUploading ? "Uploading images..." : "Upload dress photos"}
@@ -797,17 +796,10 @@ export default function AdminPage() {
                         </td>
                         <td className="py-3 px-4 text-secondary-600">
                           {isEditing ? (
-                            <div className="space-y-2">
-                              <input
-                                value={editForm.image}
-                                onChange={(e) => setEditForm({ ...editForm, image: e.target.value, images: [e.target.value, ...editForm.images.filter((url) => url !== e.target.value)].slice(0, 6) })}
-                                className="w-full p-2 border border-secondary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                              />
-                              <div className="flex gap-2">
-                                {(editForm.images || []).slice(0, 3).map((url, index) => (
-                                  <img key={`${url}-${index}`} src={url} alt={`${dress.name} image ${index + 1}`} className="h-10 w-10 object-cover rounded-lg border border-secondary-200" />
-                                ))}
-                              </div>
+                            <div className="flex gap-2">
+                              {(editForm.images || []).slice(0, 3).map((url, index) => (
+                                <img key={`${url}-${index}`} src={url} alt={`${dress.name} image ${index + 1}`} className="h-10 w-10 object-cover rounded-lg border border-secondary-200" />
+                              ))}
                             </div>
                           ) : (
                             <img src={(dress.images && dress.images.length > 0 ? dress.images[0] : dress.image)} alt={dress.name} className="h-12 w-12 object-cover rounded-lg border border-secondary-200" />
