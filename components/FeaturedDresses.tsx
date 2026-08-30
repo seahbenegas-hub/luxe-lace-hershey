@@ -32,7 +32,8 @@ export default function FeaturedDresses() {
           </div>
           <div className="p-4">
             <h3 className="font-semibold text-secondary-900">{dress.name}</h3>
-            <p className="text-primary-600 font-bold mt-1">₱{dress.price}<span className="text-sm text-secondary-400 font-normal">/day</span></p>
+            <p className="text-primary-600 font-bold mt-1">{dress.price ? `₱${dress.price * 3}` : "₱0"}</p>
+            <p className="text-xs text-secondary-500">3-day rent fee + ₱{dress.price} / add'l day</p>
           </div>
         </div>
       ))}
