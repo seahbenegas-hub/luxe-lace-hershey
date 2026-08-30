@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Dress } from "@/types";
@@ -11,14 +12,17 @@ interface DressCardProps {
 }
 
 export default function DressCard({ dress }: DressCardProps) {
+  const [imageSrc, setImageSrc] = useState(dress.image);
+
   return (
     <div className="group bg-white rounded-2xl border border-secondary-200 overflow-hidden hover:shadow-xl transition-all duration-300">
       <div className="relative aspect-[3/4] overflow-hidden bg-secondary-100">
-        <Image
-          src={dress.image}
+                <Image
+          src={imageSrc}
           alt={dress.name}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          onError={() => setImageSrc("https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800&auto=format&fit=crop")}
           className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute top-3 right-3">
