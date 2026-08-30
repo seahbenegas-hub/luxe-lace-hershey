@@ -81,7 +81,7 @@ function BookingPageContent() {
     }
   };
 
-  const handlePaymentSuccess = async (receiptFileName?: string) => {
+  const handlePaymentSuccess = async (receiptValue?: string) => {
     const newBookingId = generateId();
     setBookingId(newBookingId);
 
@@ -99,7 +99,7 @@ function BookingPageContent() {
         totalPrice,
         status: "confirmed",
         paymentStatus: "paid",
-        paymentReceipt: receiptFileName || "receipt-uploaded",
+        paymentReceipt: receiptValue || "receipt-uploaded",
       }),
     });
 

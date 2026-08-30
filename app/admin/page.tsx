@@ -121,6 +121,27 @@ export default function AdminPage() {
     }
   };
 
+  const renderReceipt = (booking: Booking) => {
+    if (!booking.paymentReceipt) {
+      return <span className="text-xs text-secondary-400">No receipt</span>;
+    }
+
+    if (booking.paymentReceipt.startsWith("data:image/")) {
+      return (
+        <a href={booking.paymentReceipt} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2">
+          <img src={booking.paymentReceipt} alt="Payment receipt" className="h-12 w-12 object-cover rounded border border-secondary-200" />
+          <span className="text-xs text-primary-600 underline">View</span>
+        </a>
+      );
+    }
+
+    return (
+      <a href={booking.paymentReceipt} target="_blank" rel="noreferrer" className="text-xs text-primary-600 underline">
+        View receipt
+      </a>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -279,6 +300,7 @@ export default function AdminPage() {
                         {format(new Date(booking.startDate), "MMM d")} - {format(new Date(booking.endDate), "MMM d, yyyy")}
                       </td>
                       <td className="py-3 px-4 font-medium text-primary-600">{formatPrice(booking.totalPrice)}</td>
+                      <td className="py-3 px-4">{renderReceipt(booking)}</td>
                       <td className="py-3 px-4">
                         <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
                           booking.status === "confirmed" ? "bg-green-50 text-green-700" :

@@ -7,7 +7,7 @@ import { CheckCircle, Upload, FileText } from "lucide-react";
 interface QRPaymentProps {
   amount: number;
   bookingId: string;
-  onSuccess: (receiptFileName?: string) => void;
+  onSuccess: (receiptValue?: string) => void;
 }
 
 export default function QRPayment({ amount, bookingId, onSuccess }: QRPaymentProps) {
@@ -21,8 +21,13 @@ export default function QRPayment({ amount, bookingId, onSuccess }: QRPaymentPro
 
   const handleSubmit = () => {
     if (!selectedFile) return;
-    setUploaded(true);
-    onSuccess(selectedFile.name);
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setUploaded(true);
+      onSuccess(typeof reader.result === "string" ? reader.result : selectedFile.name);
+    };
+    reader.readAsDataURL(selectedFile);
   };
 
   return (
