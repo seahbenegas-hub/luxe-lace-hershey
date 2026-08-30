@@ -14,10 +14,13 @@ interface DressCardProps {
 export default function DressCard({ dress }: DressCardProps) {
   const imageList = dress.images && dress.images.length > 0 ? dress.images : [dress.image];
   const [imageSrc, setImageSrc] = useState(imageList[0]);
+  const [selectedPreviewImage, setSelectedPreviewImage] = useState(imageList[0]);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   useEffect(() => {
-    setImageSrc(imageList[0]);
+    const nextImage = imageList[0];
+    setImageSrc(nextImage);
+    setSelectedPreviewImage(nextImage);
   }, [dress.id, dress.image, dress.images]);
 
   return (
@@ -110,7 +113,7 @@ export default function DressCard({ dress }: DressCardProps) {
 
             <div className="relative overflow-hidden rounded-xl bg-secondary-100">
               <img
-                src={imageList[0]}
+                src={selectedPreviewImage}
                 alt={dress.name}
                 className="max-h-[72vh] w-full object-contain"
               />
@@ -124,9 +127,9 @@ export default function DressCard({ dress }: DressCardProps) {
                     type="button"
                     onClick={() => {
                       setImageSrc(photo);
-                      setIsPreviewOpen(true);
+                      setSelectedPreviewImage(photo);
                     }}
-                    className={`overflow-hidden rounded-lg border-2 ${imageSrc === photo ? "border-primary-500" : "border-transparent"}`}
+                    className={`overflow-hidden rounded-lg border-2 ${selectedPreviewImage === photo ? "border-primary-500" : "border-transparent"}`}
                   >
                     <img src={photo} alt={`${dress.name} photo ${index + 1}`} className="h-20 w-full object-cover" />
                   </button>
