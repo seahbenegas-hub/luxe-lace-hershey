@@ -170,13 +170,64 @@ export default function AdminPage() {
     setEditForm(null);
   };
 
+  const prepareMobileUpload = async (file: File): Promise<File | Blob> => {
+    const fileType = (file.type || "").toLowerCase();
+    const isHeic = fileType === "image/heic" || fileType === "image/heif" || /\.(heic|heif)$/i.test(file.name || "");
+
+    if (!isHeic) {
+      return file;
+    }
+
+    const dataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(new Error("Unable to read HEIC photo"));
+      reader.readAsDataURL(file);
+    });
+
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("Unable to decode HEIC photo"));
+      img.src = dataUrl;
+    });
+
+    const canvas = document.createElement("canvas");
+    const maxDimension = 1600;
+    const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
+    canvas.width = Math.max(1, Math.round(image.width * scale));
+    canvas.height = Math.max(1, Math.round(image.height * scale));
+
+    const context = canvas.getContext("2d");
+    if (!context) {
+      throw new Error("Your browser cannot process this photo format.");
+    }
+
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    const convertedBlob = await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (blob) {
+          resolve(blob);
+        } else {
+          reject(new Error("Failed to convert HEIC photo to JPG"));
+        }
+      }, "image/jpeg", 0.9);
+    });
+
+    return convertedBlob;
+  };
+
   const uploadDressImage = async (file: File) => {
     setInventoryError("");
     setImageUploading(true);
 
     try {
+      const preparedFile = await prepareMobileUpload(file);
       const formData = new FormData();
-      formData.append("file", file, file.name || "photo.jpg");
+      formData.append("file", preparedFile, `${(file.name || "photo").replace(/\.[^.]+$/, "") || "photo"}.jpg`);
       const res = await fetch("/api/dress-image", { method: "POST", body: formData });
       const result = await res.json();
 
@@ -594,7 +645,7 @@ export default function AdminPage() {
                     {imageUploading ? "Uploading image..." : "Upload dress photo"}
                     <input
                       type="file"
-                      accept="image/*,.heic,.heif"
+                      accept="image/*"
                       disabled={imageUploading}
                       onChange={(e) => {
                         const file = e.target.files?.[0];
