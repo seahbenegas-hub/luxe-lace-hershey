@@ -22,6 +22,7 @@ function normalizeBooking(row: any): Booking {
       : "pending",
     createdAt: row.created_at || row.createdAt || new Date().toISOString(),
     qrCode: row.qr_code || row.qrCode,
+    paymentReceipt: row.payment_receipt || row.paymentReceipt || undefined,
   };
 }
 
@@ -71,6 +72,7 @@ export async function POST(request: Request) {
       payment_status: validPaymentStatuses.includes(body.paymentStatus) ? body.paymentStatus : "pending",
       created_at: new Date().toISOString(),
       qr_code: body.qrCode,
+      payment_receipt: body.paymentReceipt || null,
     };
 
     if (supabaseAdmin) {
@@ -94,6 +96,7 @@ export async function POST(request: Request) {
       paymentStatus: validPaymentStatuses.includes(booking.payment_status) ? booking.payment_status : "pending",
       createdAt: booking.created_at,
       qrCode: booking.qr_code,
+      paymentReceipt: booking.payment_receipt || undefined,
     };
 
     addBooking(legacyBooking);

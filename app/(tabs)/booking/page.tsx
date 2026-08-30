@@ -4,7 +4,7 @@ import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import BookingCalendar from "@/components/BookingCalendar";
-import QRPayment from "@/components/QRPayment";
+import ReceiptUpload from "@/components/QRPayment";
 import { Dress } from "@/types";
 import { formatPrice, calculateTotalPrice, generateId } from "@/lib/utils";
 import { format } from "date-fns";
@@ -29,7 +29,7 @@ function BookingPageContent() {
   const [size, setSize] = useState("");
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
-  const [step, setStep] = useState<"select" | "details" | "payment" | "confirmed">("select");
+  const [step, setStep] = useState<"select" | "details" | "receipt" | "confirmed">("select");
   const [loading, setLoading] = useState(true);
   const [bookingId, setBookingId] = useState("");
   const [error, setError] = useState("");
@@ -77,11 +77,11 @@ function BookingPageContent() {
         setError("Please fill in all fields");
         return;
       }
-      setStep("payment");
+      setStep("receipt");
     }
   };
 
-  const handlePaymentSuccess = async () => {
+  const handlePaymentSuccess = async (receiptFileName?: string) => {
     const newBookingId = generateId();
     setBookingId(newBookingId);
 
@@ -99,6 +99,7 @@ function BookingPageContent() {
         totalPrice,
         status: "confirmed",
         paymentStatus: "paid",
+        paymentReceipt: receiptFileName || "receipt-uploaded",
       }),
     });
 
@@ -119,8 +120,8 @@ function BookingPageContent() {
 
       {/* Progress */}
       <div className="flex items-center gap-2 mb-8">
-        {["Select Dress", "Your Details", "Payment", "Confirmed"].map((s, i) => {
-          const steps = ["select", "details", "payment", "confirmed"];
+        {["Select Dress", "Your Details", "Receipt", "Confirmed"].map((s, i) => {
+          const steps = ["select", "details", "receipt", "confirmed"];
           const currentStep = steps.indexOf(step);
           return (
             <div key={s} className="flex items-center gap-2 flex-1">
@@ -271,15 +272,15 @@ function BookingPageContent() {
               onClick={handleContinue}
               className="flex-1 py-3 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-colors"
             >
-              Proceed to Payment
+              Proceed to Receipt Upload
             </button>
           </div>
         </div>
       )}
 
-      {/* Step 3: Payment */}
-      {step === "payment" && (
-        <QRPayment
+      {/* Step 3: Receipt Upload */}
+      {step === "receipt" && (
+        <ReceiptUpload
           amount={totalPrice}
           bookingId={bookingId || "pending"}
           onSuccess={handlePaymentSuccess}
@@ -320,8 +321,8 @@ function BookingPageContent() {
                 <p className="font-medium text-primary-600">{formatPrice(totalPrice)}</p>
               </div>
               <div>
-                <p className="text-secondary-400">Payment</p>
-                <p className="font-medium text-green-600">Paid via QRPH</p>
+                <p className="text-secondary-400">Receipt</p>
+                <p className="font-medium text-green-600">Uploaded</p>
               </div>
             </div>
           </div>

@@ -15,8 +15,8 @@ const steps = [
   },
   {
     icon: CreditCard,
-    title: "Pay with QRPH",
-    description: "Secure checkout using QRPH payment. Simply scan the QR code with your banking app and confirm the payment.",
+    title: "Upload Payment Receipt",
+    description: "After making your payment, upload a screenshot or photo of the receipt so we can confirm your booking quickly.",
     color: "bg-green-50 text-green-600",
   },
   {

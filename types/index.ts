@@ -24,6 +24,7 @@ export interface Booking {
   paymentStatus: "pending" | "paid" | "refunded";
   createdAt: string;
   qrCode?: string;
+  paymentReceipt?: string;
 }
 
 export interface User {
