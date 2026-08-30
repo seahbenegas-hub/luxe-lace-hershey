@@ -138,15 +138,7 @@ export default function Navbar() {
               >
                 Sign Out
               </button>
-            ) : (
-              <Link
-                href="/consumer-signin"
-                onClick={() => setIsOpen(false)}
-                className="block px-3 py-2 rounded-lg text-sm font-medium bg-primary-600 text-white text-center"
-              >
-                Sign In
-              </Link>
-            )}
+            ) : null}
           </div>
         </div>
       )}
