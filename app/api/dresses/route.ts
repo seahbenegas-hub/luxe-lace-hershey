@@ -6,7 +6,12 @@ export async function GET() {
   if (supabase) {
     const { data, error } = await supabase.from("dresses").select("*").order("created_at", { ascending: false });
 
-    if (!error && data && data.length > 0) {
+    if (error) {
+      console.error("Supabase dress query error:", error);
+      return NextResponse.json({ error: "Unable to load dresses from Supabase" }, { status: 500 });
+    }
+
+    if (data) {
       return NextResponse.json(data);
     }
   }
@@ -32,7 +37,10 @@ export async function POST(request: Request) {
 
     if (supabaseAdmin) {
       const { data, error } = await supabaseAdmin.from("dresses").insert([draftDress]).select().single();
-      if (!error && data) {
+      if (error) {
+        console.error("Supabase insert error:", error);
+        return NextResponse.json({ error: "Unable to save dress to Supabase" }, { status: 500 });
+      } else if (data) {
         return NextResponse.json(data);
       }
     }
@@ -71,6 +79,9 @@ export async function PATCH(request: Request) {
       if (!error && data) {
         return NextResponse.json(data);
       }
+
+      console.error("Supabase update error:", error);
+      return NextResponse.json({ error: "Unable to update dress in Supabase" }, { status: 500 });
     }
 
     const index = dresses.findIndex((dress) => dress.id === id);
@@ -100,6 +111,9 @@ export async function DELETE(request: Request) {
       if (!error) {
         return NextResponse.json({ success: true });
       }
+
+      console.error("Supabase delete error:", error);
+      return NextResponse.json({ error: "Unable to delete dress from Supabase" }, { status: 500 });
     }
 
     const index = dresses.findIndex((dress) => dress.id === id);
