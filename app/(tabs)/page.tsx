@@ -161,12 +161,6 @@ export default async function HomePage() {
             >
               Start Browsing
             </Link>
-            <Link
-              href="/pricing"
-              className="px-8 py-3 bg-primary-700 text-white rounded-xl font-semibold hover:bg-primary-800 transition-colors"
-            >
-              View Pricing
-            </Link>
           </div>
         </div>
       </section>
