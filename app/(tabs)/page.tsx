@@ -1,15 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Sparkles, Truck, Shield, Clock } from "lucide-react";
-import { supabaseAdmin } from "@/lib/supabase";
+import { supabase, supabaseAdmin } from "@/lib/supabase";
 import { Dress } from "@/types";
 
 export const dynamic = "force-dynamic";
 
 async function getFeaturedDresses() {
-  if (!supabaseAdmin) return [];
+  const database = supabaseAdmin || supabase;
+  if (!database) return [];
 
-  const { data } = await supabaseAdmin
+  const { data } = await database
     .from("dresses")
     .select("*")
     .eq("featured", true)
