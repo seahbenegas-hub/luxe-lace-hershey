@@ -17,6 +17,9 @@ import {
   CheckCircle,
   Clock,
   Package,
+  Edit3,
+  Save,
+  X,
 } from "lucide-react";
 
 export default function AdminPage() {
@@ -26,6 +29,18 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"overview" | "bookings" | "inventory">("overview");
   const [searchTerm, setSearchTerm] = useState("");
+  const [editingDressId, setEditingDressId] = useState<string | null>(null);
+  const [isAddingNew, setIsAddingNew] = useState(false);
+  const [editForm, setEditForm] = useState<{
+    name: string;
+    description: string;
+    price: string;
+    image: string;
+    sizeText: string;
+    category: string;
+    color: string;
+    available: boolean;
+  } | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -100,6 +115,84 @@ export default function AdminPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const beginEditDress = (dress: Dress) => {
+    setIsAddingNew(false);
+    setEditingDressId(dress.id);
+    setEditForm({
+      name: dress.name,
+      description: dress.description,
+      price: String(dress.price),
+      image: dress.image,
+      sizeText: dress.size.join(", "),
+      category: dress.category,
+      color: dress.color,
+      available: dress.available,
+    });
+  };
+
+  const beginAddDress = () => {
+    setEditingDressId(null);
+    setIsAddingNew(true);
+    setEditForm({
+      name: "New Dress",
+      description: "",
+      price: "0",
+      image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&auto=format&fit=crop",
+      sizeText: "XS, S, M, L",
+      category: "New",
+      color: "Neutral",
+      available: true,
+    });
+  };
+
+  const cancelEditDress = () => {
+    setEditingDressId(null);
+    setIsAddingNew(false);
+    setEditForm(null);
+  };
+
+  const saveDressEdits = async () => {
+    if (!editForm) return;
+
+    const payload = {
+      ...(isAddingNew ? {} : { id: editingDressId }),
+      name: editForm.name.trim(),
+      description: editForm.description.trim(),
+      price: Number(editForm.price),
+      image: editForm.image.trim(),
+      size: editForm.sizeText
+        .split(",")
+        .map((size) => size.trim())
+        .filter(Boolean),
+      category: editForm.category.trim(),
+      color: editForm.color.trim(),
+      available: editForm.available,
+      occasion: "General",
+    };
+
+    const method = isAddingNew ? "POST" : "PATCH";
+    const res = await fetch("/api/dresses", {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(isAddingNew ? payload : { id: editingDressId, updates: payload }),
+    });
+
+    if (!res.ok) {
+      console.error("Failed to save dress");
+      return;
+    }
+
+    const savedDress = await res.json();
+
+    if (isAddingNew) {
+      setDresses((prev) => [savedDress, ...prev]);
+    } else {
+      setDresses((prev) => prev.map((dress) => (dress.id === editingDressId ? { ...dress, ...savedDress } : dress)));
+    }
+
+    cancelEditDress();
   };
 
   const updateBookingStatus = async (id: string, status: string) => {
@@ -377,7 +470,40 @@ export default function AdminPage() {
         {/* Inventory */}
         {activeTab === "inventory" && (
           <div className="bg-white rounded-2xl border border-secondary-200 p-6">
-            <h2 className="text-lg font-semibold text-secondary-900 mb-6">Dress Inventory</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold text-secondary-900">Dress Inventory</h2>
+              <button
+                onClick={beginAddDress}
+                className="px-3 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
+              >
+                + Add Dress
+              </button>
+            </div>
+
+            {isAddingNew && editForm && (
+              <div className="mb-6 rounded-xl border border-dashed border-primary-200 bg-primary-50 p-4 space-y-3">
+                <div className="grid md:grid-cols-2 gap-3">
+                  <input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} placeholder="Dress name" className="p-2 border border-secondary-200 rounded-lg" />
+                  <input value={editForm.category} onChange={(e) => setEditForm({ ...editForm, category: e.target.value })} placeholder="Category" className="p-2 border border-secondary-200 rounded-lg" />
+                  <input value={editForm.color} onChange={(e) => setEditForm({ ...editForm, color: e.target.value })} placeholder="Color" className="p-2 border border-secondary-200 rounded-lg" />
+                  <input type="number" value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: e.target.value })} placeholder="Price" className="p-2 border border-secondary-200 rounded-lg" />
+                  <input value={editForm.sizeText} onChange={(e) => setEditForm({ ...editForm, sizeText: e.target.value })} placeholder="Sizes: XS, S, M" className="md:col-span-2 p-2 border border-secondary-200 rounded-lg" />
+                  <input value={editForm.image} onChange={(e) => setEditForm({ ...editForm, image: e.target.value })} placeholder="Image URL" className="md:col-span-2 p-2 border border-secondary-200 rounded-lg" />
+                  <textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} placeholder="Description" className="md:col-span-2 p-2 border border-secondary-200 rounded-lg min-h-[80px]" />
+                </div>
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 text-sm text-secondary-700">
+                    <input type="checkbox" checked={editForm.available} onChange={(e) => setEditForm({ ...editForm, available: e.target.checked })} />
+                    Available
+                  </label>
+                  <div className="flex gap-2">
+                    <button onClick={saveDressEdits} className="inline-flex items-center gap-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700"> <Save className="w-4 h-4" /> Save Dress </button>
+                    <button onClick={cancelEditDress} className="inline-flex items-center gap-1 px-3 py-2 bg-secondary-200 text-secondary-700 rounded-lg text-sm font-medium hover:bg-secondary-300"> <X className="w-4 h-4" /> Cancel </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -385,28 +511,120 @@ export default function AdminPage() {
                     <th className="text-left py-3 px-4 font-medium text-secondary-500">Name</th>
                     <th className="text-left py-3 px-4 font-medium text-secondary-500">Category</th>
                     <th className="text-left py-3 px-4 font-medium text-secondary-500">Size</th>
-                    <th className="text-left py-3 px-4 font-medium text-secondary-500">Color</th>
+                    <th className="text-left py-3 px-4 font-medium text-secondary-500">Image</th>
                     <th className="text-left py-3 px-4 font-medium text-secondary-500">Price/Day</th>
                     <th className="text-left py-3 px-4 font-medium text-secondary-500">Status</th>
+                    <th className="text-left py-3 px-4 font-medium text-secondary-500">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {dresses.map((dress) => (
-                    <tr key={dress.id} className="border-b border-secondary-100 hover:bg-secondary-50">
-                      <td className="py-3 px-4 font-medium text-secondary-900">{dress.name}</td>
-                      <td className="py-3 px-4 text-secondary-600">{dress.category}</td>
-                      <td className="py-3 px-4 text-secondary-600">{dress.size.join(", ")}</td>
-                      <td className="py-3 px-4 text-secondary-600">{dress.color}</td>
-                      <td className="py-3 px-4 font-medium text-primary-600">{formatPrice(dress.price)}</td>
-                      <td className="py-3 px-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          dress.available ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
-                        }`}>
-                          {dress.available ? "Available" : "Unavailable"}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
+                  {dresses.map((dress) => {
+                    const isEditing = editingDressId === dress.id && editForm;
+
+                    return (
+                      <tr key={dress.id} className="border-b border-secondary-100 hover:bg-secondary-50 align-top">
+                        <td className="py-3 px-4 font-medium text-secondary-900">
+                          {isEditing ? (
+                            <input
+                              value={editForm.name}
+                              onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                              className="w-full p-2 border border-secondary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            />
+                          ) : (
+                            dress.name
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-secondary-600">
+                          {isEditing ? (
+                            <input
+                              value={editForm.category}
+                              onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
+                              className="w-full p-2 border border-secondary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            />
+                          ) : (
+                            dress.category
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-secondary-600">
+                          {isEditing ? (
+                            <input
+                              value={editForm.sizeText}
+                              onChange={(e) => setEditForm({ ...editForm, sizeText: e.target.value })}
+                              className="w-full p-2 border border-secondary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            />
+                          ) : (
+                            dress.size.join(", ")
+                          )}
+                        </td>
+                        <td className="py-3 px-4 text-secondary-600">
+                          {isEditing ? (
+                            <input
+                              value={editForm.image}
+                              onChange={(e) => setEditForm({ ...editForm, image: e.target.value })}
+                              className="w-full p-2 border border-secondary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            />
+                          ) : (
+                            <img src={dress.image} alt={dress.name} className="h-12 w-12 object-cover rounded-lg border border-secondary-200" />
+                          )}
+                        </td>
+                        <td className="py-3 px-4 font-medium text-primary-600">
+                          {isEditing ? (
+                            <input
+                              type="number"
+                              value={editForm.price}
+                              onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
+                              className="w-24 p-2 border border-secondary-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            />
+                          ) : (
+                            formatPrice(dress.price)
+                          )}
+                        </td>
+                        <td className="py-3 px-4">
+                          {isEditing ? (
+                            <label className="flex items-center gap-2 text-sm text-secondary-700">
+                              <input
+                                type="checkbox"
+                                checked={editForm.available}
+                                onChange={(e) => setEditForm({ ...editForm, available: e.target.checked })}
+                              />
+                              Available
+                            </label>
+                          ) : (
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              dress.available ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+                            }`}>
+                              {dress.available ? "Available" : "Unavailable"}
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4">
+                          {isEditing ? (
+                            <div className="flex gap-2">
+                              <button
+                                onClick={saveDressEdits}
+                                className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 rounded text-xs font-medium hover:bg-green-100"
+                              >
+                                <Save className="w-3 h-3" /> Save
+                              </button>
+                              <button
+                                onClick={cancelEditDress}
+                                className="inline-flex items-center gap-1 px-2 py-1 bg-secondary-100 text-secondary-700 rounded text-xs font-medium hover:bg-secondary-200"
+                              >
+                                <X className="w-3 h-3" /> Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => beginEditDress(dress)}
+                              className="inline-flex items-center gap-1 px-2 py-1 bg-primary-50 text-primary-700 rounded text-xs font-medium hover:bg-primary-100"
+                            >
+                              <Edit3 className="w-3 h-3" /> Edit
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

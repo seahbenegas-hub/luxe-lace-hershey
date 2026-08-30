@@ -67,7 +67,7 @@ export default function MyRentalsPage() {
         <Package className="w-16 h-16 text-secondary-300 mx-auto mb-4" />
         <h2 className="text-2xl font-bold text-secondary-900 mb-2">Sign In Required</h2>
         <p className="text-secondary-500">Please sign in to view your rental history.</p>
-        <a href="/admin/login" className="inline-block mt-6 px-6 py-3 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-colors">
+        <a href="/consumer-signin" className="inline-block mt-6 px-6 py-3 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-colors">
           Sign In
         </a>
       </div>

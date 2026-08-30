@@ -44,6 +44,9 @@ export default function AdminLoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-secondary-50 px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center px-3 py-1.5 rounded-full bg-primary-50 text-primary-700 text-xs font-semibold tracking-[0.2em] uppercase mb-4">
+            Luxe & Lace
+          </div>
           <h1 className="text-2xl font-bold text-secondary-900">Admin Login</h1>
           <p className="text-secondary-500 mt-1">Sign in to manage your inventory</p>
         </div>
