@@ -31,6 +31,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"overview" | "bookings" | "inventory">("overview");
   const [searchTerm, setSearchTerm] = useState("");
+  const [adminName, setAdminName] = useState("Administrator");
   const [editingDressId, setEditingDressId] = useState<string | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [inventoryError, setInventoryError] = useState("");
@@ -50,6 +51,17 @@ export default function AdminPage() {
     const user = localStorage.getItem("user");
 
     if (!user) {
+      router.push("/admin/login");
+      return;
+    }
+
+    try {
+      const parsedUser = JSON.parse(user);
+      if (typeof parsedUser.name === "string" && parsedUser.name.trim()) {
+        setAdminName(parsedUser.name.trim());
+      }
+    } catch {
+      localStorage.removeItem("user");
       router.push("/admin/login");
       return;
     }
@@ -336,6 +348,7 @@ export default function AdminPage() {
             <h1 className="text-lg font-bold text-secondary-900">Admin Dashboard</h1>
           </div>
           <div className="flex items-center gap-3">
+            <span className="hidden sm:inline text-sm text-secondary-600">{adminName}</span>
             <button
               onClick={refreshBookings}
               disabled={loading}
