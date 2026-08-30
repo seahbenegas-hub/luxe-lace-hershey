@@ -21,6 +21,7 @@ import {
   Save,
   X,
   Trash2,
+  Upload,
 } from "lucide-react";
 
 export default function AdminPage() {
@@ -33,6 +34,7 @@ export default function AdminPage() {
   const [editingDressId, setEditingDressId] = useState<string | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [inventoryError, setInventoryError] = useState("");
+  const [imageUploading, setImageUploading] = useState(false);
   const [editForm, setEditForm] = useState<{
     name: string;
     description: string;
@@ -153,6 +155,29 @@ export default function AdminPage() {
     setEditingDressId(null);
     setIsAddingNew(false);
     setEditForm(null);
+  };
+
+  const uploadDressImage = async (file: File) => {
+    setInventoryError("");
+    setImageUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/dress-image", { method: "POST", body: formData });
+      const result = await res.json();
+
+      if (!res.ok) {
+        setInventoryError(result.error || "Failed to upload dress image");
+        return;
+      }
+
+      setEditForm((current) => current ? { ...current, image: result.url } : current);
+    } catch {
+      setInventoryError("Failed to upload dress image");
+    } finally {
+      setImageUploading(false);
+    }
   };
 
   const saveDressEdits = async () => {
@@ -518,6 +543,20 @@ export default function AdminPage() {
                   <input type="number" value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: e.target.value })} placeholder="Price" className="p-2 border border-secondary-200 rounded-lg" />
                   <input value={editForm.sizeText} onChange={(e) => setEditForm({ ...editForm, sizeText: e.target.value })} placeholder="Sizes: XS, S, M" className="md:col-span-2 p-2 border border-secondary-200 rounded-lg" />
                   <input value={editForm.image} onChange={(e) => setEditForm({ ...editForm, image: e.target.value })} placeholder="Image URL" className="md:col-span-2 p-2 border border-secondary-200 rounded-lg" />
+                  <label className="md:col-span-2 flex items-center gap-2 p-2 border border-secondary-200 rounded-lg bg-white text-sm text-secondary-600 cursor-pointer">
+                    <Upload className="w-4 h-4" />
+                    {imageUploading ? "Uploading image..." : "Upload dress photo"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={imageUploading}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) uploadDressImage(file);
+                      }}
+                      className="sr-only"
+                    />
+                  </label>
                   <textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} placeholder="Description" className="md:col-span-2 p-2 border border-secondary-200 rounded-lg min-h-[80px]" />
                 </div>
                 <div className="flex items-center justify-between">
@@ -526,7 +565,7 @@ export default function AdminPage() {
                     Available
                   </label>
                   <div className="flex gap-2">
-                    <button onClick={saveDressEdits} className="inline-flex items-center gap-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700"> <Save className="w-4 h-4" /> Save Dress </button>
+                    <button onClick={saveDressEdits} disabled={imageUploading} className="inline-flex items-center gap-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"> <Save className="w-4 h-4" /> Save Dress </button>
                     <button onClick={cancelEditDress} className="inline-flex items-center gap-1 px-3 py-2 bg-secondary-200 text-secondary-700 rounded-lg text-sm font-medium hover:bg-secondary-300"> <X className="w-4 h-4" /> Cancel </button>
                   </div>
                 </div>
