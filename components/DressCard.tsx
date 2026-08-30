@@ -165,26 +165,7 @@ export default function DressCard({ dress }: DressCardProps) {
             </button>
 
             <div className="relative overflow-hidden rounded-xl bg-secondary-100">
-              <div className="flex items-center justify-between gap-2 border-b border-secondary-200 bg-white/80 px-2 py-2 backdrop-blur-sm">
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={goToPrevious}
-                    disabled={imageList.length <= 1}
-                    className="rounded-full bg-secondary-900 px-3 py-1.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    ← Prev
-                  </button>
-                  <button
-                    type="button"
-                    onClick={goToNext}
-                    disabled={imageList.length <= 1}
-                    className="rounded-full bg-secondary-900 px-3 py-1.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    Next →
-                  </button>
-                </div>
-
+              <div className="flex items-center justify-center gap-2 border-b border-secondary-200 bg-white/80 px-2 py-2 backdrop-blur-sm">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
