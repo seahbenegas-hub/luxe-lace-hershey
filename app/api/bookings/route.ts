@@ -88,6 +88,12 @@ export async function POST(request: Request) {
     if (supabaseAdmin) {
       const { data, error } = await supabaseAdmin.from("bookings").insert([booking]).select().single();
 
+      if (error) {
+        console.error("Supabase booking insert error:", error);
+        // Log the booking object to verify field names
+        console.error("Booking object being inserted:", booking);
+      }
+
       if (!error && data) {
         return NextResponse.json(normalizeBooking(data), { status: 201 });
       }

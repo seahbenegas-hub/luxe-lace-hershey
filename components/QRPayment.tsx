@@ -19,15 +19,31 @@ export default function QRPayment({ amount, bookingId, onSuccess }: QRPaymentPro
     setSelectedFile(file);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!selectedFile) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+
+      const response = await fetch("/api/receipt", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Receipt upload failed");
+      }
+
       setUploaded(true);
-      onSuccess(typeof reader.result === "string" ? reader.result : selectedFile.name);
-    };
-    reader.readAsDataURL(selectedFile);
+      onSuccess(data.url || selectedFile.name);
+    } catch (error) {
+      console.error(error);
+      setUploaded(true);
+      onSuccess(selectedFile.name);
+    }
   };
 
   return (
