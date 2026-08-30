@@ -13,19 +13,28 @@ export async function POST(request: Request) {
 
     const formData = await request.formData();
     const file = formData.get("file");
+    const imageExtensions = /\.(png|jpg|jpeg|gif|webp|heic|heif|bmp)$/i;
 
-    if (!(file instanceof File) || !file.type.startsWith("image/")) {
+    if (!(file instanceof File)) {
       return NextResponse.json({ error: "Please upload an image file" }, { status: 400 });
+    }
+
+    const hasValidMime = file.type.startsWith("image/");
+    const hasValidExtension = imageExtensions.test(file.name || "");
+
+    if (!hasValidMime && !hasValidExtension) {
+      return NextResponse.json({ error: "Please upload a valid image file" }, { status: 400 });
     }
 
     if (file.size > 10 * 1024 * 1024) {
       return NextResponse.json({ error: "Image must be 10 MB or smaller" }, { status: 413 });
     }
 
-    const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
-    const path = `dresses/${crypto.randomUUID()}.${extension}`;
+    const safeExtension = (file.name.split(".").pop()?.toLowerCase() || "jpg").replace(/heif/i, "jpg");
+    const contentType = file.type.startsWith("image/") ? file.type : "image/jpeg";
+    const path = `dresses/${crypto.randomUUID()}.${safeExtension}`;
     let { data, error } = await supabaseAdmin.storage.from(bucketName).upload(path, file, {
-      contentType: file.type,
+      contentType,
       upsert: false,
     });
 
