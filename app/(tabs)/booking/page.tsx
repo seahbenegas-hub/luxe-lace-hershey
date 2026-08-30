@@ -92,6 +92,10 @@ function BookingPageContent() {
     })
   );
 
+  const isThreeDayWindowValid = Boolean(
+    selectedDress && startDate && endDate && endDate.getTime() - startDate.getTime() <= 2 * 24 * 60 * 60 * 1000
+  );
+
   const handleContinue = () => {
     setError("");
     if (step === "select") {
@@ -103,8 +107,12 @@ function BookingPageContent() {
         setError("Please select rental dates");
         return;
       }
+      if (!isThreeDayWindowValid) {
+        setError("Each booking is limited to 3 days only. Please choose a valid 3-day rental window.");
+        return;
+      }
       if (hasBookingConflict) {
-        setError("This dress is already booked for one or more of the selected dates. Please choose another range.");
+        setError("This dress is already booked for one or more of the selected dates. Please choose another 3-day window.");
         return;
       }
       setStep("details");

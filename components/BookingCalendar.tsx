@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isBefore, startOfDay } from "date-fns";
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, isBefore, startOfDay, addDays } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -33,38 +33,16 @@ export default function BookingCalendar({ selectedStart, selectedEnd, onSelectSt
   const handleDateClick = (day: Date) => {
     if (isBefore(day, today) || isBooked(day)) return;
 
-    if (!selectedStart) {
+    const endDate = addDays(day, 2);
+
+    if (!selectedStart || (selectedStart && selectedEnd && selectedStart.getTime() === selectedEnd.getTime())) {
       onSelectStart(day);
-      onSelectEnd(day);
+      onSelectEnd(endDate);
       return;
     }
 
-    if (selectedStart && !selectedEnd) {
-      if (day < selectedStart) {
-        onSelectStart(day);
-        onSelectEnd(day);
-        return;
-      }
-
-      onSelectEnd(day);
-      return;
-    }
-
-    if (selectedStart && selectedEnd) {
-      if (selectedStart.getTime() === selectedEnd.getTime()) {
-        if (day < selectedStart) {
-          onSelectStart(day);
-          onSelectEnd(day);
-          return;
-        }
-
-        onSelectEnd(day);
-        return;
-      }
-
-      onSelectStart(day);
-      onSelectEnd(day);
-    }
+    onSelectStart(day);
+    onSelectEnd(endDate);
   };
 
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
