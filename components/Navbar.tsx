@@ -10,7 +10,6 @@ const navLinks = [
   { href: "/", label: "Home" },
   { href: "/catalog", label: "Dress Catalog" },
   { href: "/how-it-works", label: "How It Works" },
-  { href: "/pricing", label: "Pricing" },
   { href: "/booking", label: "Booking" },
   { href: "/my-rentals", label: "My Rentals" },
 ];
