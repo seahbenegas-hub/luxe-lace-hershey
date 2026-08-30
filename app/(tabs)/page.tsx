@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Sparkles, Truck, Shield, Clock } from "lucide-react";
+import { ArrowRight, Sparkles, Truck, Shield } from "lucide-react";
 import FeaturedDresses from "@/components/FeaturedDresses";
 
 export default function HomePage() {
@@ -63,8 +63,8 @@ export default function HomePage() {
             },
             {
               icon: Truck,
-              title: "Free Delivery",
-              description: "Complimentary delivery and pickup for all rentals within the city.",
+              title: "Delivery",
+              description: "Convenient delivery and pickup options are available for rentals within the city.",
             },
             {
               icon: Shield,
