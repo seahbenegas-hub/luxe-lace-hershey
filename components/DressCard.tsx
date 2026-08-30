@@ -168,14 +168,14 @@ export default function DressCard({ dress }: DressCardProps) {
 
       {isPreviewOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 sm:p-6">
-          <div className="relative w-full max-w-5xl rounded-2xl bg-white p-3 shadow-2xl">
+          <div className="relative w-full max-w-5xl rounded-2xl bg-white p-3 shadow-2xl overflow-hidden">
             <button
               type="button"
               onClick={() => setIsPreviewOpen(false)}
-              className="absolute top-3 right-3 rounded-full bg-secondary-100 p-2 text-secondary-800 hover:bg-secondary-200 transition-colors"
+              className="absolute top-2 right-2 z-10 rounded-full bg-white border-2 border-secondary-200 p-2 text-secondary-800 hover:bg-secondary-100 transition-colors"
               aria-label="Close preview"
             >
-              <X className="w-5 h-5" />
+              <X className="w-6 h-6" />
             </button>
 
             <div className="relative overflow-hidden rounded-xl bg-secondary-100">
