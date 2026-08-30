@@ -40,7 +40,17 @@ export async function GET(request: Request) {
     const { data, error } = await query.order("created_at", { ascending: false });
 
     if (!error && data) {
-      return NextResponse.json(data.map(normalizeBooking));
+      const normalized = data.map(normalizeBooking);
+
+      if (normalized.length > 0 || bookings.length === 0) {
+        return NextResponse.json(normalized);
+      }
+
+      if (email) {
+        return NextResponse.json(bookings.filter((b) => b.userEmail === email));
+      }
+
+      return NextResponse.json(bookings);
     }
   }
 
