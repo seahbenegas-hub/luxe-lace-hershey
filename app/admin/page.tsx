@@ -172,11 +172,13 @@ export default function AdminPage() {
 
   const normalizeMobileImage = async (file: File) => {
     const mimeType = file.type || "image/jpeg";
-    const isHeic = mimeType === "image/heic" || mimeType === "image/heif" || /\.(heic|heif)$/i.test(file.name);
+    const isHeic = mimeType === "image/heic" || mimeType === "image/heif" || /\.(heic|heif)$/i.test(file.name || "");
 
     if (!isHeic) {
       return file;
     }
+
+    const baseName = (file.name || "photo").replace(/\.[^.]+$/, "") || "photo";
 
     return await new Promise<File>((resolve, reject) => {
       const url = URL.createObjectURL(file);
@@ -208,10 +210,7 @@ export default function AdminPage() {
               return;
             }
 
-            const converted = new File([blob], file.name.replace(/\.(heic|heif)$/i, ".jpg"), {
-              type: "image/jpeg",
-            });
-            resolve(converted);
+            resolve(new File([blob], `${baseName}.jpg`, { type: "image/jpeg" }));
           },
           "image/jpeg",
           0.9
@@ -652,7 +651,7 @@ export default function AdminPage() {
                     {imageUploading ? "Uploading image..." : "Upload dress photo"}
                     <input
                       type="file"
-                      accept="image/*,.heic,.heif"
+                      accept="image/*"
                       disabled={imageUploading}
                       onChange={(e) => {
                         const file = e.target.files?.[0];
