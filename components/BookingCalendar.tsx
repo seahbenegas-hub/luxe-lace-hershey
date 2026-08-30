@@ -10,9 +10,10 @@ interface BookingCalendarProps {
   selectedEnd: Date | null;
   onSelectStart: (date: Date) => void;
   onSelectEnd: (date: Date) => void;
+  blockedDates?: Date[];
 }
 
-export default function BookingCalendar({ selectedStart, selectedEnd, onSelectStart, onSelectEnd }: BookingCalendarProps) {
+export default function BookingCalendar({ selectedStart, selectedEnd, onSelectStart, onSelectEnd, blockedDates = [] }: BookingCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const today = startOfDay(new Date());
 
@@ -20,13 +21,17 @@ export default function BookingCalendar({ selectedStart, selectedEnd, onSelectSt
   const monthEnd = endOfMonth(currentMonth);
   const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
+  const isBooked = (day: Date) => {
+    return blockedDates.some((date) => isSameDay(startOfDay(date), startOfDay(day)));
+  };
+
   const isInRange = (day: Date) => {
     if (!selectedStart || !selectedEnd) return false;
     return day >= selectedStart && day <= selectedEnd;
   };
 
   const handleDateClick = (day: Date) => {
-    if (isBefore(day, today)) return;
+    if (isBefore(day, today) || isBooked(day)) return;
 
     if (!selectedStart) {
       onSelectStart(day);
@@ -34,19 +39,32 @@ export default function BookingCalendar({ selectedStart, selectedEnd, onSelectSt
       return;
     }
 
-    if (selectedStart && selectedEnd) {
-      onSelectStart(day);
+    if (selectedStart && !selectedEnd) {
+      if (day < selectedStart) {
+        onSelectStart(day);
+        onSelectEnd(day);
+        return;
+      }
+
       onSelectEnd(day);
       return;
     }
 
-    if (day < selectedStart) {
-      onSelectStart(day);
-      onSelectEnd(selectedStart);
-      return;
-    }
+    if (selectedStart && selectedEnd) {
+      if (selectedStart.getTime() === selectedEnd.getTime()) {
+        if (day < selectedStart) {
+          onSelectStart(day);
+          onSelectEnd(day);
+          return;
+        }
 
-    onSelectEnd(day);
+        onSelectEnd(day);
+        return;
+      }
+
+      onSelectStart(day);
+      onSelectEnd(day);
+    }
   };
 
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -84,20 +102,22 @@ export default function BookingCalendar({ selectedStart, selectedEnd, onSelectSt
           );
           const isRange = isInRange(day);
           const isPast = isBefore(day, today);
+          const isBookedDate = isBooked(day);
           const isCurrentMonth = isSameMonth(day, currentMonth);
 
           return (
             <button
               key={index}
               onClick={() => handleDateClick(day)}
-              disabled={isPast}
+              disabled={isPast || isBookedDate}
               className={cn(
                 "aspect-square flex items-center justify-center text-sm rounded-lg transition-all",
                 !isCurrentMonth && "text-secondary-300",
                 isPast && "text-secondary-300 cursor-not-allowed",
+                isBookedDate && "bg-red-100 text-red-500 cursor-not-allowed line-through",
                 isSelected && "bg-primary-600 text-white font-semibold shadow-lg shadow-primary-200",
                 isRange && !isSelected && "bg-primary-50 text-primary-700",
-                !isSelected && !isRange && !isPast && isCurrentMonth && "hover:bg-secondary-100 text-secondary-700"
+                !isSelected && !isRange && !isPast && !isBookedDate && isCurrentMonth && "hover:bg-secondary-100 text-secondary-700"
               )}
             >
               {format(day, "d")}

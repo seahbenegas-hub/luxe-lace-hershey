@@ -5,9 +5,9 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import BookingCalendar from "@/components/BookingCalendar";
 import ReceiptUpload from "@/components/QRPayment";
-import { Dress } from "@/types";
+import { Booking, Dress } from "@/types";
 import { formatPrice, calculateTotalPrice, generateId } from "@/lib/utils";
-import { format } from "date-fns";
+import { eachDayOfInterval, isSameDay, format, startOfDay } from "date-fns";
 import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
 
 export default function BookingPage() {
@@ -26,6 +26,7 @@ function BookingPageContent() {
   const [selectedDress, setSelectedDress] = useState<Dress | null>(null);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
+  const [bookedDates, setBookedDates] = useState<Date[]>([]);
   const [size, setSize] = useState("");
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
@@ -56,9 +57,40 @@ function BookingPageContent() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!selectedDress) {
+      setBookedDates([]);
+      return;
+    }
+
+    fetch("/api/bookings")
+      .then((res) => res.json())
+      .then((data: Booking[]) => {
+        const conflicts = data.filter(
+          (booking) => booking.dressId === selectedDress.id && booking.status !== "cancelled"
+        );
+
+        const dates = conflicts.flatMap((booking) => {
+          const start = startOfDay(new Date(booking.startDate));
+          const end = startOfDay(new Date(booking.endDate));
+          return eachDayOfInterval({ start, end });
+        });
+
+        setBookedDates(dates);
+      })
+      .catch(() => setBookedDates([]));
+  }, [selectedDress]);
+
   const totalPrice = selectedDress && startDate && endDate
     ? calculateTotalPrice(selectedDress.price, startDate.toISOString(), endDate.toISOString())
     : 0;
+
+  const hasBookingConflict = Boolean(
+    selectedDress && startDate && endDate && bookedDates.some((date) => {
+      const day = startOfDay(date);
+      return day >= startOfDay(startDate) && day <= startOfDay(endDate);
+    })
+  );
 
   const handleContinue = () => {
     setError("");
@@ -69,6 +101,10 @@ function BookingPageContent() {
       }
       if (!startDate || !endDate) {
         setError("Please select rental dates");
+        return;
+      }
+      if (hasBookingConflict) {
+        setError("This dress is already booked for one or more of the selected dates. Please choose another range.");
         return;
       }
       setStep("details");
@@ -198,6 +234,7 @@ function BookingPageContent() {
                 selectedEnd={endDate}
                 onSelectStart={setStartDate}
                 onSelectEnd={setEndDate}
+                blockedDates={bookedDates}
               />
               {startDate && endDate && (
                 <div className="mt-4 p-4 bg-primary-50 rounded-xl">
