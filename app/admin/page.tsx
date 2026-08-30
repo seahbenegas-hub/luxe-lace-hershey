@@ -170,70 +170,13 @@ export default function AdminPage() {
     setEditForm(null);
   };
 
-  const normalizeMobileImage = async (file: File) => {
-    const mimeType = file.type || "image/jpeg";
-    const isHeic = mimeType === "image/heic" || mimeType === "image/heif" || /\.(heic|heif)$/i.test(file.name || "");
-
-    if (!isHeic) {
-      return file;
-    }
-
-    const baseName = (file.name || "photo").replace(/\.[^.]+$/, "") || "photo";
-
-    return await new Promise<File>((resolve, reject) => {
-      const url = URL.createObjectURL(file);
-      const image = new Image();
-
-      image.onload = () => {
-        const canvas = document.createElement("canvas");
-        const maxDimension = 1600;
-        const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
-        canvas.width = Math.max(1, Math.round(image.width * scale));
-        canvas.height = Math.max(1, Math.round(image.height * scale));
-
-        const context = canvas.getContext("2d");
-        if (!context) {
-          URL.revokeObjectURL(url);
-          reject(new Error("Unable to process mobile image"));
-          return;
-        }
-
-        context.fillStyle = "#ffffff";
-        context.fillRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(image, 0, 0, canvas.width, canvas.height);
-
-        canvas.toBlob(
-          (blob) => {
-            URL.revokeObjectURL(url);
-            if (!blob) {
-              reject(new Error("Unable to convert mobile image"));
-              return;
-            }
-
-            resolve(new File([blob], `${baseName}.jpg`, { type: "image/jpeg" }));
-          },
-          "image/jpeg",
-          0.9
-        );
-      };
-
-      image.onerror = () => {
-        URL.revokeObjectURL(url);
-        reject(new Error("Unable to read the selected mobile photo"));
-      };
-
-      image.src = url;
-    });
-  };
-
   const uploadDressImage = async (file: File) => {
     setInventoryError("");
     setImageUploading(true);
 
     try {
-      const normalizedFile = await normalizeMobileImage(file);
       const formData = new FormData();
-      formData.append("file", normalizedFile, normalizedFile.name);
+      formData.append("file", file, file.name || "photo.jpg");
       const res = await fetch("/api/dress-image", { method: "POST", body: formData });
       const result = await res.json();
 

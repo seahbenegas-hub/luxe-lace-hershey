@@ -19,7 +19,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Please upload an image file" }, { status: 400 });
     }
 
-    const hasValidMime = file.type.startsWith("image/");
+    const hasValidMime = typeof file.type === "string" && file.type.startsWith("image/");
     const hasValidExtension = imageExtensions.test(file.name || "");
 
     if (!hasValidMime && !hasValidExtension) {
@@ -30,8 +30,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Image must be 10 MB or smaller" }, { status: 413 });
     }
 
-    const safeExtension = (file.name.split(".").pop()?.toLowerCase() || "jpg").replace(/heif/i, "jpg");
-    const contentType = file.type.startsWith("image/") ? file.type : "image/jpeg";
+    const safeExtension = (file.name?.split(".").pop()?.toLowerCase() || "jpg").replace(/heif/i, "jpg").replace(/heic/i, "jpg");
+    const contentType = hasValidMime ? file.type : "image/jpeg";
     const path = `dresses/${crypto.randomUUID()}.${safeExtension}`;
     let { data, error } = await supabaseAdmin.storage.from(bucketName).upload(path, file, {
       contentType,
