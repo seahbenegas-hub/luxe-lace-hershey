@@ -20,13 +20,17 @@ export default function GoogleSignIn({ onSuccess, onError }: GoogleSignInProps) 
       const decoded: any = jwtDecode(credentialResponse.credential);
       const email = decoded.email;
       const name = decoded.name;
-
-      // Store in localStorage for booking flow
-      localStorage.setItem("user", JSON.stringify({
+      const consumerUser = {
         email,
         name,
         googleId: decoded.sub,
-      }));
+        role: "user",
+      };
+
+      // Store in localStorage for booking flow and navbar state
+      localStorage.setItem("consumer_user", JSON.stringify(consumerUser));
+      localStorage.setItem("user", JSON.stringify(consumerUser));
+      window.dispatchEvent(new Event("user-state-changed"));
 
       if (onSuccess) {
         onSuccess(email, name);

@@ -21,14 +21,37 @@ export default function Navbar() {
   const [user, setUser] = useState<{ name: string; role: string } | null>(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem("user");
-    if (stored) setUser(JSON.parse(stored));
+    const syncUser = () => {
+      const consumerUser = localStorage.getItem("consumer_user");
+      const adminUser = localStorage.getItem("user");
+
+      if (consumerUser) {
+        setUser(JSON.parse(consumerUser));
+        return;
+      }
+
+      if (adminUser) {
+        setUser(JSON.parse(adminUser));
+        return;
+      }
+
+      setUser(null);
+    };
+
+    syncUser();
+    window.addEventListener("user-state-changed", syncUser);
+
+    return () => {
+      window.removeEventListener("user-state-changed", syncUser);
+    };
   }, []);
 
   const handleLogout = () => {
+    localStorage.removeItem("consumer_user");
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     setUser(null);
+    window.dispatchEvent(new Event("user-state-changed"));
     window.location.href = "/";
   };
 
