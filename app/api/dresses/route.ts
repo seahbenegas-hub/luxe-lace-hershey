@@ -5,6 +5,12 @@ import { isAdmin, unauthorized } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
 
+const normalizeDress = (dress: any) => ({
+  ...dress,
+  ...(dress.additional_day_price !== undefined ? { additionalDayPrice: Number(dress.additional_day_price || 0) } : {}),
+  ...(dress.additionalDayPrice !== undefined ? { additionalDayPrice: Number(dress.additionalDayPrice || 0) } : {}),
+});
+
 export async function GET() {
   const database = supabaseAdmin || supabase;
 
@@ -17,13 +23,13 @@ export async function GET() {
     }
 
     if (data) {
-      return NextResponse.json(data, {
+      return NextResponse.json(data.map(normalizeDress), {
         headers: { "Cache-Control": "no-store, max-age=0" },
       });
     }
   }
 
-  return NextResponse.json(dresses, {
+  return NextResponse.json(dresses.map((dress) => normalizeDress(dress)), {
     headers: { "Cache-Control": "no-store, max-age=0" },
   });
 }
@@ -41,7 +47,7 @@ export async function POST(request: Request) {
       name: body.name || "New Dress",
       description: body.description || "",
       price: Number(body.price || 0),
-      additional_day_price: Number(body.additionalDayPrice ?? 0),
+      additional_day_price: Number(body.additionalDayPrice ?? body.additional_day_price ?? 0),
       size: Array.isArray(body.size) ? body.size : ["S", "M", "L"],
       color: body.color || "Neutral",
       occasion: body.occasion || "General",
@@ -77,11 +83,14 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "Missing dress id or updates" }, { status: 400 });
     }
 
+    const { additionalDayPrice, additional_day_price, ...restUpdates } = updates;
     const normalizedUpdates = {
-      ...updates,
-      ...(updates.additionalDayPrice !== undefined ? { additional_day_price: Number(updates.additionalDayPrice || 0) } : {}),
-      ...(updates.size !== undefined && Array.isArray(updates.size)
-        ? { size: updates.size }
+      ...restUpdates,
+      ...(additionalDayPrice !== undefined || additional_day_price !== undefined
+        ? { additional_day_price: Number(additionalDayPrice ?? additional_day_price ?? 0) }
+        : {}),
+      ...(restUpdates.size !== undefined && Array.isArray(restUpdates.size)
+        ? { size: restUpdates.size }
         : {}),
     };
 
@@ -93,7 +102,7 @@ export async function PATCH(request: Request) {
       .maybeSingle();
 
     if (!error && data) {
-      return NextResponse.json(data);
+      return NextResponse.json(normalizeDress(data));
     }
 
     console.error("Supabase update error:", error);
