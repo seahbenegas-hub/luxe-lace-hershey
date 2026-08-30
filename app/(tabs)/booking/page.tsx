@@ -82,7 +82,7 @@ function BookingPageContent() {
   };
 
   const handlePaymentSuccess = async (receiptValue?: string) => {
-    const newBookingId = generateId();
+    const newBookingId = crypto.randomUUID();
     setBookingId(newBookingId);
 
     try {
