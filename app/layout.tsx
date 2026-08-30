@@ -53,6 +53,16 @@ export default function RootLayout({
       <body className={inter.className}>
         <Navbar />
         <main className="min-h-screen bg-secondary-50">{children}</main>
+        <footer className="border-t border-secondary-200 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-wrap items-center justify-between gap-4 text-sm text-secondary-500">
+            <span>Luxe & Lace — Hershey</span>
+            <nav className="flex flex-wrap gap-4">
+              <a href="/support" className="hover:text-primary-600">Support</a>
+              <a href="/privacy" className="hover:text-primary-600">Privacy</a>
+              <a href="/terms" className="hover:text-primary-600">Terms</a>
+            </nav>
+          </div>
+        </footer>
       </body>
     </html>
   );
