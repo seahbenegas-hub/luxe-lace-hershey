@@ -4,6 +4,8 @@ import { ArrowRight, Sparkles, Truck, Shield, Clock } from "lucide-react";
 import { supabaseAdmin } from "@/lib/supabase";
 import { Dress } from "@/types";
 
+export const dynamic = "force-dynamic";
+
 async function getFeaturedDresses() {
   if (!supabaseAdmin) return [];
 
