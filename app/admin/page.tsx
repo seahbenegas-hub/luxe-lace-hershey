@@ -347,35 +347,39 @@ export default function AdminPage() {
     <div className="min-h-screen bg-secondary-50">
       {/* Admin Header */}
       <header className="bg-white border-b border-secondary-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <LayoutDashboard className="w-6 h-6 text-primary-600" />
-            <h1 className="text-lg font-bold text-secondary-900">Admin Dashboard</h1>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-0 sm:h-16 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <LayoutDashboard className="w-6 h-6 text-primary-600 shrink-0" />
+              <h1 className="text-base sm:text-lg font-bold text-secondary-900 truncate">Admin Dashboard</h1>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="hidden sm:inline text-sm text-secondary-600">{adminName}</span>
-            <button
-              onClick={refreshBookings}
-              disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors disabled:opacity-50"
-            >
-              <TrendingUp className="w-4 h-4" />
-              Refresh
-            </button>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-              Sign Out
-            </button>
+          <div className="flex items-center justify-between gap-2 sm:gap-3 flex-wrap">
+            <span className="text-xs sm:text-sm text-secondary-600 truncate max-w-[140px] sm:max-w-none">{adminName}</span>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button
+                onClick={refreshBookings}
+                disabled={loading}
+                className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors disabled:opacity-50"
+              >
+                <TrendingUp className="w-4 h-4" />
+                Refresh
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Tabs */}
-        <div className="flex gap-2 mb-8">
+        <div className="flex flex-wrap gap-2 mb-8">
           {[
             { id: "overview", label: "Overview", icon: LayoutDashboard },
             { id: "bookings", label: "Bookings", icon: ShoppingBag },
@@ -384,7 +388,7 @@ export default function AdminPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as typeof activeTab)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`flex flex-1 items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors min-w-[110px] ${
                 activeTab === tab.id
                   ? "bg-primary-600 text-white"
                   : "bg-white text-secondary-600 hover:bg-secondary-100 border border-secondary-200"
@@ -418,8 +422,8 @@ export default function AdminPage() {
 
             <div className="bg-white rounded-2xl border border-secondary-200 p-6">
               <h2 className="text-lg font-semibold text-secondary-900 mb-4">Recent Bookings</h2>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+              <div className="overflow-x-auto -mx-1 px-1 pb-2">
+                <table className="w-full min-w-[640px] text-sm">
                   <thead>
                     <tr className="border-b border-secondary-200">
                       <th className="text-left py-3 px-4 font-medium text-secondary-500">ID</th>
@@ -463,21 +467,21 @@ export default function AdminPage() {
         {/* Bookings */}
         {activeTab === "bookings" && (
           <div className="bg-white rounded-2xl border border-secondary-200 p-6">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
               <h2 className="text-lg font-semibold text-secondary-900">All Bookings</h2>
-              <div className="relative">
+              <div className="relative w-full sm:w-64">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary-400" />
                 <input
                   type="text"
                   placeholder="Search bookings..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9 pr-4 py-2 bg-secondary-50 border border-secondary-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full pl-9 pr-4 py-2 bg-secondary-50 border border-secondary-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
               </div>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+            <div className="overflow-x-auto -mx-1 px-1 pb-2">
+              <table className="w-full min-w-[760px] text-sm">
                 <thead>
                   <tr className="border-b border-secondary-200">
                     <th className="text-left py-3 px-4 font-medium text-secondary-500">ID</th>
@@ -517,7 +521,7 @@ export default function AdminPage() {
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
                           {booking.status === "pending" && (
                             <button
                               onClick={() => updateBookingStatus(booking.id, "confirmed")}
@@ -561,11 +565,11 @@ export default function AdminPage() {
         {/* Inventory */}
         {activeTab === "inventory" && (
           <div className="bg-white rounded-2xl border border-secondary-200 p-6">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
               <h2 className="text-lg font-semibold text-secondary-900">Dress Inventory</h2>
               <button
                 onClick={beginAddDress}
-                className="px-3 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors"
+                className="px-3 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 transition-colors self-start sm:self-auto"
               >
                 + Add Dress
               </button>
@@ -600,16 +604,18 @@ export default function AdminPage() {
                   </label>
                   <textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} placeholder="Description" className="md:col-span-2 p-2 border border-secondary-200 rounded-lg min-h-[80px]" />
                 </div>
-                <div className="flex items-center justify-between">
-                  <label className="flex items-center gap-2 text-sm text-secondary-700">
-                    <input type="checkbox" checked={editForm.available} onChange={(e) => setEditForm({ ...editForm, available: e.target.checked })} />
-                    Available
-                  </label>
-                  <label className="flex items-center gap-2 text-sm text-secondary-700">
-                    <input type="checkbox" checked={editForm.featured} onChange={(e) => setEditForm({ ...editForm, featured: e.target.checked })} />
-                    Featured on homepage
-                  </label>
-                  <div className="flex gap-2">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+                    <label className="flex items-center gap-2 text-sm text-secondary-700">
+                      <input type="checkbox" checked={editForm.available} onChange={(e) => setEditForm({ ...editForm, available: e.target.checked })} />
+                      Available
+                    </label>
+                    <label className="flex items-center gap-2 text-sm text-secondary-700">
+                      <input type="checkbox" checked={editForm.featured} onChange={(e) => setEditForm({ ...editForm, featured: e.target.checked })} />
+                      Featured on homepage
+                    </label>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
                     <button onClick={saveDressEdits} disabled={imageUploading} className="inline-flex items-center gap-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"> <Save className="w-4 h-4" /> Save Dress </button>
                     <button onClick={cancelEditDress} className="inline-flex items-center gap-1 px-3 py-2 bg-secondary-200 text-secondary-700 rounded-lg text-sm font-medium hover:bg-secondary-300"> <X className="w-4 h-4" /> Cancel </button>
                   </div>
@@ -746,7 +752,7 @@ export default function AdminPage() {
                               </button>
                             </div>
                           ) : (
-                            <div className="flex gap-2">
+                            <div className="flex flex-wrap gap-2">
                               <button
                                 onClick={() => beginEditDress(dress)}
                                 className="inline-flex items-center gap-1 px-2 py-1 bg-primary-50 text-primary-700 rounded text-xs font-medium hover:bg-primary-100"
