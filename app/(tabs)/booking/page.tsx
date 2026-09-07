@@ -64,17 +64,18 @@ function BookingPageContent() {
       return;
     }
 
-    fetch("/api/bookings")
-      .then((res) => res.json())
-      .then((data: Booking[]) => {
-        const conflicts = data.filter(
-          (booking) => booking.dressId === selectedDress.id && booking.status !== "cancelled"
-        );
-
-        const dates = conflicts.flatMap((booking) => {
+    fetch(`/api/availability/${encodeURIComponent(selectedDress.id)}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Unable to load availability");
+        return res.json();
+      })
+      .then((data: { startDate: string; endDate: string }[]) => {
+        const dates = data.flatMap((booking) => {
           const start = startOfDay(new Date(booking.startDate));
           const end = startOfDay(new Date(booking.endDate));
-          return eachDayOfInterval({ start, end });
+          return Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())
+            ? []
+            : eachDayOfInterval({ start, end });
         });
 
         setBookedDates(dates);

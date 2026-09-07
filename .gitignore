@@ -4,3 +4,4 @@ node_modules/
 file.env
 *.log
 .DS_Store
+*.tsbuildinfo
