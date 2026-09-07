@@ -96,15 +96,16 @@ export default function BookingCalendar({ selectedStart, selectedEnd, onSelectSt
               key={index}
               onClick={() => handleDateClick(day)}
               disabled={isPast || isUnavailableStart}
+              title={isBookedDate ? "Unavailable: already rented" : isUnavailableStart ? "Unavailable for this rental window" : "Select rental start date"}
               className={cn(
-                "aspect-square flex items-center justify-center text-sm rounded-lg transition-all",
+                "aspect-square flex items-center justify-center text-sm rounded-lg transition-all duration-200",
                 !isCurrentMonth && "text-secondary-300",
                 isPast && "text-secondary-300 cursor-not-allowed",
-                isBookedDate && "bg-red-100 text-red-500 cursor-not-allowed line-through",
+                isBookedDate && "bg-red-100 text-red-500 cursor-not-allowed line-through shadow-inner",
                 isUnavailableStart && !isBookedDate && "bg-red-50 text-red-400 cursor-not-allowed",
-                isSelected && "bg-primary-600 text-white font-semibold shadow-lg shadow-primary-200",
-                isRange && !isSelected && "bg-primary-50 text-primary-700",
-                !isSelected && !isRange && !isPast && !isBookedDate && isCurrentMonth && "hover:bg-secondary-100 text-secondary-700"
+                isSelected && "z-10 scale-105 bg-primary-600 text-white font-semibold shadow-lg shadow-primary-200 ring-2 ring-primary-200",
+                isRange && !isSelected && "bg-primary-50 text-primary-700 shadow-sm",
+                !isSelected && !isRange && !isPast && !isBookedDate && !isUnavailableStart && isCurrentMonth && "text-secondary-700 hover:scale-105 hover:bg-secondary-100 hover:shadow-sm"
               )}
             >
               {format(day, "d")}
