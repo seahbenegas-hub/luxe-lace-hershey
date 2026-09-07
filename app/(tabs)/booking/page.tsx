@@ -64,15 +64,15 @@ function BookingPageContent() {
       return;
     }
 
-    setError("");
-    fetch(`/api/availability/${encodeURIComponent(selectedDress.id)}?t=${Date.now()}`, {
-      cache: "no-store",
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error("Unable to load availability");
-        return res.json();
-      })
-      .then((data: { startDate: string; endDate: string }[]) => {
+    let active = true;
+    const loadAvailability = async () => {
+      try {
+        const response = await fetch(`/api/availability/${encodeURIComponent(selectedDress.id)}?t=${Date.now()}`, {
+          cache: "no-store",
+        });
+        if (!response.ok) throw new Error("Unable to load availability");
+
+        const data: { startDate: string; endDate: string }[] = await response.json();
         const dates = data.flatMap((booking) => {
           const start = startOfDay(new Date(booking.startDate));
           const end = startOfDay(new Date(booking.endDate));
@@ -81,12 +81,27 @@ function BookingPageContent() {
             : eachDayOfInterval({ start, end });
         });
 
-        setBookedDates(dates);
-      })
-      .catch(() => {
-        setBookedDates([]);
-        setError("Availability could not be loaded. Please refresh and try again.");
-      });
+        if (active) {
+          setBookedDates(dates);
+          setError("");
+        }
+      } catch {
+        if (active) {
+          setBookedDates([]);
+          setError("Availability could not be loaded. Please refresh and try again.");
+        }
+      }
+    };
+
+    loadAvailability();
+    const refreshInterval = window.setInterval(loadAvailability, 10000);
+    window.addEventListener("focus", loadAvailability);
+
+    return () => {
+      active = false;
+      window.clearInterval(refreshInterval);
+      window.removeEventListener("focus", loadAvailability);
+    };
   }, [selectedDress]);
 
   useEffect(() => {
