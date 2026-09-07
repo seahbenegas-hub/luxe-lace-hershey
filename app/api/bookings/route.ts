@@ -67,6 +67,36 @@ async function hasDateConflict(dressId: string, startDate: Date, endDate: Date) 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const email = searchParams.get("email");
+  const dressId = searchParams.get("dressId");
+
+  if (dressId) {
+    const database = supabaseAdmin || supabase;
+    if (database) {
+      const { data, error } = await database
+        .from("bookings")
+        .select("start_date, end_date, status")
+        .eq("dress_id", dressId);
+
+      if (error) {
+        console.error("Supabase availability query error:", error);
+        return NextResponse.json({ error: "Unable to load dress availability" }, { status: 500 });
+      }
+
+      return NextResponse.json(
+        (data || [])
+          .filter((booking) => ["pending", "confirmed", "inprogress"].includes(normalizeStatus(booking.status)))
+          .map((booking) => ({ startDate: booking.start_date, endDate: booking.end_date })),
+        { headers: { "Cache-Control": "no-store, max-age=0" } }
+      );
+    }
+
+    return NextResponse.json(
+      bookings
+        .filter((booking) => booking.dressId === dressId && ["pending", "confirmed", "inprogress"].includes(booking.status))
+        .map((booking) => ({ startDate: booking.startDate, endDate: booking.endDate })),
+      { headers: { "Cache-Control": "no-store, max-age=0" } }
+    );
+  }
 
   if (!email && !(await isAdmin(request))) {
     return unauthorized();

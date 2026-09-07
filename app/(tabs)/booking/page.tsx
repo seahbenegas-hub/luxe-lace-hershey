@@ -67,7 +67,7 @@ function BookingPageContent() {
     let active = true;
     const loadAvailability = async () => {
       try {
-        const response = await fetch(`/api/availability/${encodeURIComponent(selectedDress.id)}?t=${Date.now()}`, {
+        const response = await fetch(`/api/bookings?dressId=${encodeURIComponent(selectedDress.id)}&t=${Date.now()}`, {
           cache: "no-store",
         });
         if (!response.ok) throw new Error("Unable to load availability");
