@@ -394,6 +394,8 @@ export default function AdminPage() {
     }
   };
 
+  const getStatusLabel = (status: string) => status === "inprogress" ? "In Progress" : status;
+
   const renderReceipt = (booking: Booking) => {
     if (!booking.paymentReceipt) {
       return <span className="text-xs text-secondary-400">No receipt</span>;
@@ -533,7 +535,7 @@ export default function AdminPage() {
                             "bg-red-50 text-red-700"
                           }`}>
                             {getStatusIcon(booking.status)}
-                            {booking.status}
+                            {getStatusLabel(booking.status)}
                           </span>
                         </td>
                       </tr>
@@ -599,7 +601,7 @@ export default function AdminPage() {
                           "bg-red-50 text-red-700"
                         }`}>
                           {getStatusIcon(booking.status)}
-                          {booking.status}
+                          {getStatusLabel(booking.status)}
                         </span>
                       </td>
                       <td className="py-3 px-4">

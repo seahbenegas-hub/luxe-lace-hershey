@@ -13,6 +13,13 @@ import {
 const validStatuses = ["pending", "confirmed", "inprogress", "completed", "cancelled"] as const;
 const validPaymentStatuses = ["pending", "paid", "refunded"] as const;
 
+function normalizeStatus(status: unknown) {
+  const normalized = String(status || "").toLowerCase().replace(/\s+/g, "");
+  return validStatuses.includes(normalized as typeof validStatuses[number])
+    ? normalized as typeof validStatuses[number]
+    : "pending";
+}
+
 function normalizeBooking(row: any): Booking {
   return {
     id: row.id,
@@ -23,7 +30,7 @@ function normalizeBooking(row: any): Booking {
     startDate: row.start_date || row.startDate,
     endDate: row.end_date || row.endDate,
     totalPrice: Number(row.total_price ?? row.totalPrice ?? 0),
-    status: validStatuses.includes(row.status) ? row.status : "pending",
+    status: normalizeStatus(row.status),
     paymentStatus: validPaymentStatuses.includes(row.payment_status)
       ? row.payment_status
       : "pending",
@@ -122,7 +129,7 @@ export async function POST(request: Request) {
       start_date: startDate.toISOString(),
       end_date: endDate.toISOString(),
       total_price: totalPrice,
-      status: validStatuses.includes(body.status) ? body.status : "pending",
+      status: normalizeStatus(body.status),
       payment_status: validPaymentStatuses.includes(body.paymentStatus) ? body.paymentStatus : "pending",
       created_at: new Date().toISOString(),
       qr_code: body.qrCode,
@@ -196,8 +203,11 @@ export async function PATCH(request: Request) {
 
     const updates: Partial<{ status: string; payment_status: string }> = {};
 
-    if (body.status && validStatuses.includes(body.status)) {
-      updates.status = body.status;
+    if (body.status) {
+      const status = normalizeStatus(body.status);
+      if (status !== "pending" || String(body.status).toLowerCase().replace(/\s+/g, "") === "pending") {
+        updates.status = status;
+      }
     }
 
     if (body.paymentStatus && validPaymentStatuses.includes(body.paymentStatus)) {
