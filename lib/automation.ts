@@ -155,3 +155,13 @@ export async function sendOverdueReminder(booking: Booking) {
     luxeLaceTemplate("Your rental needs attention", greeting, `<p>Our records show that your rental was due back on <strong>${escapeHtml(formatDate(booking.endDate))}</strong>. Please arrange its return as soon as possible.</p>${bookingDetails(booking)}<p>Please contact us if the dress has already been returned.</p>`)
   );
 }
+
+export async function sendRentalThankYou(booking: Booking) {
+  const greeting = `Hi ${booking.userName},`;
+  return sendEmail(
+    booking.userEmail,
+    `Thank you for renting with Luxe & Lace`,
+    `${greeting}\n\nThank you for renting the ${booking.dressName} from Luxe & Lace. We hope you felt wonderful wearing it.\n\nBooking ID: ${booking.id}\n\nWe would love to hear about your experience. Thank you for choosing Luxe & Lace.`,
+    luxeLaceTemplate("Thank you for choosing us", greeting, `<p>Thank you for renting the <strong>${escapeHtml(booking.dressName)}</strong> from Luxe &amp; Lace. We hope you felt wonderful wearing it.</p>${bookingDetails(booking)}<p>We would love to hear about your experience. Thank you for choosing Luxe &amp; Lace.</p>`)
+  );
+}

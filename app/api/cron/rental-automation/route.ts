@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import {
   sendOverdueReminder,
   sendReturnReminder,
+  sendRentalThankYou,
 } from "@/lib/automation";
 import type { Booking } from "@/types";
 
@@ -110,9 +111,48 @@ export async function GET(request: Request) {
     }
   }
 
+  const { data: completed, error: completedError } = await supabaseAdmin
+    .from("bookings")
+    .select("*")
+    .eq("status", "confirmed")
+    .lt("end_date", now.toISOString());
+
+  if (completedError) {
+    return NextResponse.json({ error: completedError.message }, { status: 500 });
+  }
+
+  const completedIds = (completed || []).map((booking) => booking.id);
+  if (completedIds.length > 0) {
+    await supabaseAdmin.from("bookings").update({ status: "completed" }).in("id", completedIds);
+  }
+
+  const { data: thankYouDue, error: thankYouError } = await supabaseAdmin
+    .from("bookings")
+    .select("*")
+    .eq("status", "completed")
+    .is("completed_email_sent_at", null);
+
+  if (thankYouError) {
+    return NextResponse.json({ error: thankYouError.message }, { status: 500 });
+  }
+
+  let thankYouEmailsSent = 0;
+  for (const row of thankYouDue || []) {
+    const booking = normalizeBooking(row);
+    if (await sendRentalThankYou(booking)) {
+      await supabaseAdmin
+        .from("bookings")
+        .update({ completed_email_sent_at: now.toISOString() })
+        .eq("id", booking.id);
+      thankYouEmailsSent += 1;
+    }
+  }
+
   return NextResponse.json({
     expiredUnpaidBookings: expiredIds.length,
     returnRemindersSent,
     overdueRemindersSent,
+    completedBookings: completedIds.length,
+    thankYouEmailsSent,
   });
 }
