@@ -73,8 +73,9 @@ export async function GET(request: Request) {
   }
 
   // Always try Supabase first
-  if (supabase) {
-    let query = supabase.from("bookings").select("*");
+  const database = supabaseAdmin || supabase;
+  if (database) {
+    let query = database.from("bookings").select("*");
 
     if (email) {
       query = query.eq("user_email", email);
