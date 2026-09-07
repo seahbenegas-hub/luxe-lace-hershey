@@ -26,13 +26,18 @@ export default function BookingCalendar({ selectedStart, selectedEnd, onSelectSt
     return blockedDates.some((date) => isSameDay(startOfDay(date), startOfDay(day)));
   };
 
+  const isStartDateUnavailable = (day: Date) => {
+    const endDate = addDays(day, 3 + extraDays - 1);
+    return eachDayOfInterval({ start: day, end: endDate }).some(isBooked);
+  };
+
   const isInRange = (day: Date) => {
     if (!selectedStart || !selectedEnd) return false;
     return day >= selectedStart && day <= selectedEnd;
   };
 
   const handleDateClick = (day: Date) => {
-    if (isBefore(day, today) || isBooked(day)) return;
+    if (isBefore(day, today) || isStartDateUnavailable(day)) return;
 
     const totalRentalDays = 3 + extraDays;
     const endDate = addDays(day, totalRentalDays - 1);
@@ -83,18 +88,20 @@ export default function BookingCalendar({ selectedStart, selectedEnd, onSelectSt
           const isRange = isInRange(day);
           const isPast = isBefore(day, today);
           const isBookedDate = isBooked(day);
+          const isUnavailableStart = isStartDateUnavailable(day);
           const isCurrentMonth = isSameMonth(day, currentMonth);
 
           return (
             <button
               key={index}
               onClick={() => handleDateClick(day)}
-              disabled={isPast || isBookedDate}
+              disabled={isPast || isUnavailableStart}
               className={cn(
                 "aspect-square flex items-center justify-center text-sm rounded-lg transition-all",
                 !isCurrentMonth && "text-secondary-300",
                 isPast && "text-secondary-300 cursor-not-allowed",
                 isBookedDate && "bg-red-100 text-red-500 cursor-not-allowed line-through",
+                isUnavailableStart && !isBookedDate && "bg-red-50 text-red-400 cursor-not-allowed",
                 isSelected && "bg-primary-600 text-white font-semibold shadow-lg shadow-primary-200",
                 isRange && !isSelected && "bg-primary-50 text-primary-700",
                 !isSelected && !isRange && !isPast && !isBookedDate && isCurrentMonth && "hover:bg-secondary-100 text-secondary-700"
