@@ -101,9 +101,9 @@ export default function BookingCalendar({ selectedStart, selectedEnd, onSelectSt
                 "aspect-square flex items-center justify-center text-sm rounded-lg transition-all duration-200",
                 !isCurrentMonth && "text-secondary-300",
                 isPast && "text-secondary-300 cursor-not-allowed",
-                isBookedDate && "bg-red-100 text-red-500 cursor-not-allowed line-through shadow-inner",
+                isBookedDate && "z-10 bg-red-100 text-red-600 cursor-not-allowed line-through shadow-inner",
                 isUnavailableStart && !isBookedDate && "bg-red-50 text-red-400 cursor-not-allowed",
-                isSelected && "z-10 scale-105 bg-primary-600 text-white font-semibold shadow-lg shadow-primary-200 ring-2 ring-primary-200",
+                isSelected && !isBookedDate && "z-10 scale-105 bg-primary-600 text-white font-semibold shadow-lg shadow-primary-200 ring-2 ring-primary-200",
                 isRange && !isSelected && "bg-primary-50 text-primary-700 shadow-sm",
                 !isSelected && !isRange && !isPast && !isBookedDate && !isUnavailableStart && isCurrentMonth && "text-secondary-700 hover:scale-105 hover:bg-secondary-100 hover:shadow-sm"
               )}
@@ -122,6 +122,10 @@ export default function BookingCalendar({ selectedStart, selectedEnd, onSelectSt
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 rounded bg-primary-50" />
           <span>Range</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="w-3 h-3 rounded bg-red-100" />
+          <span>Unavailable</span>
         </div>
       </div>
     </div>
