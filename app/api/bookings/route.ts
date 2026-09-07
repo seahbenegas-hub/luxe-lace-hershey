@@ -91,6 +91,9 @@ export async function GET(request: Request) {
 
     // If there was an error, fall back to local
     console.error("Supabase booking fetch error:", error);
+    if (!email && await isAdmin(request)) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
   }
 
   // Fallback to local bookings only if Supabase failed

@@ -35,6 +35,7 @@ export default function AdminPage() {
   const [editingDressId, setEditingDressId] = useState<string | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [inventoryError, setInventoryError] = useState("");
+  const [bookingsError, setBookingsError] = useState("");
   const [imageUploading, setImageUploading] = useState(false);
   const [editForm, setEditForm] = useState<{
     name: string;
@@ -93,11 +94,19 @@ export default function AdminPage() {
         }
 
         Promise.all([
-          fetch("/api/bookings", { cache: "no-store" }).then((r) => r.json()),
-          fetch("/api/dresses", { cache: "no-store" }).then((r) => r.json()),
-        ]).then(([b, d]) => {
-          setBookings(b);
-          setDresses(d);
+          fetch("/api/bookings", { cache: "no-store" }),
+          fetch("/api/dresses", { cache: "no-store" }),
+        ]).then(async ([bookingsResponse, dressesResponse]) => {
+          const bookingsData = await bookingsResponse.json();
+          const dressesData = await dressesResponse.json();
+          if (!bookingsResponse.ok || !Array.isArray(bookingsData)) {
+            throw new Error(bookingsData?.error || "Failed to load bookings");
+          }
+          setBookings(bookingsData);
+          setDresses(dressesData);
+          setLoading(false);
+        }).catch((error) => {
+          setBookingsError(error instanceof Error ? error.message : "Failed to load bookings");
           setLoading(false);
         });
       } catch {
@@ -461,6 +470,10 @@ export default function AdminPage() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        {bookingsError && (
+          <p className="mb-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">Bookings could not be loaded: {bookingsError}</p>
+        )}
+
         {/* Tabs */}
         <div className="flex flex-wrap gap-2 mb-8">
           {[
