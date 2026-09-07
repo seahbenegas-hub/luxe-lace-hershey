@@ -3,7 +3,11 @@ import { bookings, addBooking, updateBooking } from "@/lib/db";
 import { supabase, supabaseAdmin } from "@/lib/supabase";
 import type { Booking } from "@/types";
 import { isAdmin, unauthorized } from "@/lib/security";
-import { sendAdminBookingNotification, sendBookingConfirmation } from "@/lib/automation";
+import {
+  sendAdminBookingNotification,
+  sendBookingConfirmation,
+  sendRentalThankYou,
+} from "@/lib/automation";
 
 const validStatuses = ["pending", "confirmed", "completed", "cancelled"] as const;
 const validPaymentStatuses = ["pending", "paid", "refunded"] as const;
@@ -176,12 +180,24 @@ export async function PATCH(request: Request) {
     }
 
     if (supabaseAdmin) {
-      const { error } = await supabaseAdmin
+      const { data, error } = await supabaseAdmin
         .from("bookings")
         .update(updates)
-        .eq("id", body.id);
+        .eq("id", body.id)
+        .select()
+        .single();
 
       if (!error) {
+        if (updates.status === "completed" && data && !data.completed_email_sent_at) {
+          const completedBooking = normalizeBooking(data);
+          if (await sendRentalThankYou(completedBooking)) {
+            await supabaseAdmin
+              .from("bookings")
+              .update({ completed_email_sent_at: new Date().toISOString() })
+              .eq("id", body.id);
+          }
+        }
+
         return NextResponse.json({ success: true });
       }
 
