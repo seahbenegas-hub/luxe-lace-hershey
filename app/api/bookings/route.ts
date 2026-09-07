@@ -272,6 +272,23 @@ export async function DELETE(request: Request) {
       const { error } = await supabaseAdmin.from("bookings").delete().eq("id", id);
 
       if (!error) {
+        const { data: remainingBooking } = await supabaseAdmin
+          .from("bookings")
+          .select("id")
+          .eq("id", id)
+          .maybeSingle();
+
+        if (remainingBooking) {
+          const { error: cancelError } = await supabaseAdmin
+            .from("bookings")
+            .update({ status: "cancelled" })
+            .eq("id", id);
+
+          if (cancelError) {
+            return NextResponse.json({ error: "Booking could not be removed" }, { status: 500 });
+          }
+        }
+
         return NextResponse.json({ success: true });
       }
 
