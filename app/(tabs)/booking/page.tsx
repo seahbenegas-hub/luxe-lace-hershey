@@ -64,7 +64,10 @@ function BookingPageContent() {
       return;
     }
 
-    fetch(`/api/availability/${encodeURIComponent(selectedDress.id)}`)
+    setError("");
+    fetch(`/api/availability/${encodeURIComponent(selectedDress.id)}?t=${Date.now()}`, {
+      cache: "no-store",
+    })
       .then((res) => {
         if (!res.ok) throw new Error("Unable to load availability");
         return res.json();
@@ -80,7 +83,10 @@ function BookingPageContent() {
 
         setBookedDates(dates);
       })
-      .catch(() => setBookedDates([]));
+      .catch(() => {
+        setBookedDates([]);
+        setError("Availability could not be loaded. Please refresh and try again.");
+      });
   }, [selectedDress]);
 
   useEffect(() => {

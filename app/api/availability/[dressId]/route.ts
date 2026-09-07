@@ -33,6 +33,9 @@ export async function GET(_request: Request, { params }: RouteContext) {
 
     if (error) {
       console.error("Supabase availability query error:", error);
+      if (supabaseAdmin) {
+        return NextResponse.json({ error: "Unable to load dress availability" }, { status: 500 });
+      }
     }
   }
 
