@@ -58,7 +58,7 @@ function bookingDetails(booking: Booking) {
   return `<table role="presentation" style="width:100%;border-collapse:collapse;margin:24px 0;font:14px Arial,sans-serif;">
     <tr><td style="padding:10px 0;color:#756b66;">Dress</td><td style="padding:10px 0;text-align:right;font-weight:bold;">${escapeHtml(booking.dressName)}</td></tr>
     <tr><td style="padding:10px 0;color:#756b66;border-top:1px solid #eee6e0;">Rental dates</td><td style="padding:10px 0;text-align:right;border-top:1px solid #eee6e0;">${escapeHtml(formatDate(booking.startDate))} - ${escapeHtml(formatDate(booking.endDate))}</td></tr>
-    <tr><td style="padding:10px 0;color:#756b66;border-top:1px solid #eee6e0;">Total</td><td style="padding:10px 0;text-align:right;border-top:1px solid #eee6e0;font-weight:bold;">$${booking.totalPrice.toFixed(2)}</td></tr>
+    <tr><td style="padding:10px 0;color:#756b66;border-top:1px solid #eee6e0;">Total</td><td style="padding:10px 0;text-align:right;border-top:1px solid #eee6e0;font-weight:bold;">₱${booking.totalPrice.toFixed(2)}</td></tr>
     <tr><td style="padding:10px 0;color:#756b66;border-top:1px solid #eee6e0;">Booking ID</td><td style="padding:10px 0;text-align:right;border-top:1px solid #eee6e0;word-break:break-all;">${escapeHtml(booking.id)}</td></tr>
   </table>`;
 }
@@ -117,7 +117,7 @@ async function sendEmail(to: string | undefined, subject: string, text: string, 
 
 export async function sendBookingConfirmation(booking: Booking) {
   const greeting = `Hi ${booking.userName},`;
-  const text = `${greeting}\n\nYour Luxe Lace rental is confirmed.\n\nDress: ${booking.dressName}\nRental dates: ${formatDate(booking.startDate)} - ${formatDate(booking.endDate)}\nTotal: $${booking.totalPrice.toFixed(2)}\n\nBooking ID: ${booking.id}\n\nThank you for choosing Luxe Lace.`;
+  const text = `${greeting}\n\nYour Luxe Lace rental is confirmed.\n\nDress: ${booking.dressName}\nRental dates: ${formatDate(booking.startDate)} - ${formatDate(booking.endDate)}\nTotal: ₱${booking.totalPrice.toFixed(2)}\n\nBooking ID: ${booking.id}\n\nThank you for choosing Luxe Lace.`;
   return sendEmail(
     booking.userEmail,
     `Booking confirmed: ${booking.dressName}`,
@@ -127,7 +127,7 @@ export async function sendBookingConfirmation(booking: Booking) {
 }
 
 export async function sendAdminBookingNotification(booking: Booking) {
-  const text = `A new booking was created.\n\nCustomer: ${booking.userName} (${booking.userEmail})\nDress: ${booking.dressName}\nRental dates: ${formatDate(booking.startDate)} - ${formatDate(booking.endDate)}\nTotal: $${booking.totalPrice.toFixed(2)}\nBooking ID: ${booking.id}`;
+  const text = `A new booking was created.\n\nCustomer: ${booking.userName} (${booking.userEmail})\nDress: ${booking.dressName}\nRental dates: ${formatDate(booking.startDate)} - ${formatDate(booking.endDate)}\nTotal: ₱${booking.totalPrice.toFixed(2)}\nBooking ID: ${booking.id}`;
   return sendEmail(
     adminEmail,
     `New dress booking: ${booking.dressName}`,
