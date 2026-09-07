@@ -94,13 +94,15 @@ function BookingPageContent() {
     };
 
     loadAvailability();
-    const refreshInterval = window.setInterval(loadAvailability, 10000);
+    const refreshInterval = window.setInterval(loadAvailability, 2000);
     window.addEventListener("focus", loadAvailability);
+    window.addEventListener("storage", loadAvailability);
 
     return () => {
       active = false;
       window.clearInterval(refreshInterval);
       window.removeEventListener("focus", loadAvailability);
+      window.removeEventListener("storage", loadAvailability);
     };
   }, [selectedDress]);
 

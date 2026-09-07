@@ -367,6 +367,7 @@ export default function AdminPage() {
     }
 
     setBookings((prev) => prev.filter((booking) => booking.id !== bookingId));
+    localStorage.setItem("booking-availability-updated", String(Date.now()));
   };
 
   const filteredBookings = bookings.filter(
