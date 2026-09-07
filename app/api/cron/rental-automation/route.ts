@@ -125,18 +125,6 @@ export async function GET(request: Request) {
   const completedIds = (completed || []).map((booking) => booking.id);
   if (completedIds.length > 0) {
     await supabaseAdmin.from("bookings").update({ status: "completed" }).in("id", completedIds);
-
-    for (const booking of completed || []) {
-      const { count } = await supabaseAdmin
-        .from("bookings")
-        .select("id", { count: "exact", head: true })
-        .eq("dress_id", booking.dress_id)
-        .in("status", ["pending", "confirmed", "inprogress"]);
-
-      if (count === 0) {
-        await supabaseAdmin.from("dresses").update({ available: true }).eq("id", booking.dress_id);
-      }
-    }
   }
 
   const { data: thankYouDue, error: thankYouError } = await supabaseAdmin

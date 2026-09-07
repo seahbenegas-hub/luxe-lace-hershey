@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { bookings, dresses, addBooking, updateBooking } from "@/lib/db";
+import { bookings, addBooking, updateBooking } from "@/lib/db";
 import { supabase, supabaseAdmin } from "@/lib/supabase";
 import type { Booking } from "@/types";
 import { isAdmin, unauthorized } from "@/lib/security";
@@ -33,28 +33,28 @@ function normalizeBooking(row: any): Booking {
   };
 }
 
-async function syncDressAvailability(dressId: string) {
+async function hasDateConflict(dressId: string, startDate: Date, endDate: Date) {
+  const activeStatuses = ["pending", "confirmed", "inprogress"];
+
   if (supabaseAdmin) {
     const { data, error } = await supabaseAdmin
       .from("bookings")
       .select("id")
       .eq("dress_id", dressId)
-      .in("status", ["pending", "confirmed", "inprogress"]);
+      .in("status", activeStatuses)
+      .lte("start_date", endDate.toISOString())
+      .gte("end_date", startDate.toISOString());
 
-    if (!error) {
-      await supabaseAdmin.from("dresses").update({ available: (data || []).length === 0 }).eq("id", dressId);
-      return;
-    }
-
-    console.error("Supabase inventory availability query error:", error);
+    if (!error) return (data || []).length > 0;
+    console.error("Supabase booking conflict query error:", error);
   }
 
-  const dress = dresses.find((item) => item.id === dressId);
-  if (dress) {
-    dress.available = !bookings.some(
-      (booking) => booking.dressId === dressId && ["pending", "confirmed", "inprogress"].includes(booking.status)
-    );
-  }
+  return bookings.some((booking) =>
+    booking.dressId === dressId &&
+    activeStatuses.includes(booking.status) &&
+    new Date(booking.startDate) <= endDate &&
+    new Date(booking.endDate) >= startDate
+  );
 }
 
 export async function GET(request: Request) {
@@ -109,6 +109,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid booking details" }, { status: 400 });
     }
 
+    if (await hasDateConflict(String(body.dressId), startDate, endDate)) {
+      return NextResponse.json({ error: "This dress is already booked for the selected dates" }, { status: 409 });
+    }
+
     const booking = {
       id: body.id || crypto.randomUUID(),
       dress_id: body.dressId,
@@ -143,7 +147,6 @@ export async function POST(request: Request) {
 
       if (data) {
         const normalized = normalizeBooking(data);
-        await syncDressAvailability(normalized.dressId);
         await Promise.all([
           sendBookingConfirmation(normalized),
           sendAdminBookingNotification(normalized),
@@ -172,7 +175,6 @@ export async function POST(request: Request) {
     };
 
     addBooking(legacyBooking);
-    await syncDressAvailability(legacyBooking.dressId);
     await Promise.all([
       sendBookingConfirmation(legacyBooking),
       sendAdminBookingNotification(legacyBooking),
@@ -215,10 +217,6 @@ export async function PATCH(request: Request) {
         .single();
 
       if (!error) {
-        if (data) {
-          await syncDressAvailability(data.dress_id);
-        }
-
         if (updates.status === "completed" && data) {
           const completedBooking = normalizeBooking(data);
           if (!data.completed_email_sent_at && await sendRentalThankYou(completedBooking)) {
@@ -257,13 +255,9 @@ export async function DELETE(request: Request) {
     }
 
     if (supabaseAdmin) {
-      const { data: booking } = await supabaseAdmin.from("bookings").select("dress_id").eq("id", id).maybeSingle();
       const { error } = await supabaseAdmin.from("bookings").delete().eq("id", id);
 
       if (!error) {
-        if (booking?.dress_id) {
-          await syncDressAvailability(booking.dress_id);
-        }
         return NextResponse.json({ success: true });
       }
 

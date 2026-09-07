@@ -22,7 +22,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
       .from("bookings")
       .select("start_date, end_date")
       .eq("dress_id", dressId)
-      .neq("status", "cancelled");
+      .in("status", ["pending", "confirmed", "inprogress"]);
 
     if (!error && data) {
       return NextResponse.json(
@@ -37,7 +37,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
   }
 
   const occupiedRanges = bookings
-    .filter((booking) => booking.dressId === dressId && booking.status !== "cancelled")
+    .filter((booking) => booking.dressId === dressId && ["pending", "confirmed", "inprogress"].includes(booking.status))
     .map((booking) => ({ startDate: booking.startDate, endDate: booking.endDate }));
 
   return NextResponse.json(occupiedRanges, {
