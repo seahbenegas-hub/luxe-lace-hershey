@@ -5,6 +5,7 @@ const resendApiKey = process.env.RESEND_API_KEY;
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
 const brevoApiKey = process.env.BREVO_API_KEY;
 const from = process.env.EMAIL_FROM || "Luxe Lace <onboarding@resend.dev>";
+const reviewUrl = process.env.REVIEW_URL;
 
 function senderDetails() {
   const match = from.match(/^(.*?)\s*<([^>]+)>$/);
@@ -163,5 +164,22 @@ export async function sendRentalThankYou(booking: Booking) {
     `Thank you for renting with Luxe & Lace`,
     `${greeting}\n\nThank you for renting the ${booking.dressName} from Luxe & Lace. We hope you felt wonderful wearing it.\n\nBooking ID: ${booking.id}\n\nWe would love to hear about your experience. Thank you for choosing Luxe & Lace.`,
     luxeLaceTemplate("Thank you for choosing us", greeting, `<p>Thank you for renting the <strong>${escapeHtml(booking.dressName)}</strong> from Luxe &amp; Lace. We hope you felt wonderful wearing it.</p>${bookingDetails(booking)}<p>We would love to hear about your experience. Thank you for choosing Luxe &amp; Lace.</p>`)
+  );
+}
+
+export async function sendReviewRequest(booking: Booking) {
+  const greeting = `Hi ${booking.userName},`;
+  const reviewMessage = reviewUrl
+    ? `Please share your experience by leaving us a review: ${reviewUrl}`
+    : "We would love to hear about your experience. You can reply to this email with your feedback.";
+  const reviewButton = reviewUrl
+    ? `<p style="margin:28px 0;text-align:center;"><a href="${escapeHtml(reviewUrl)}" style="display:inline-block;padding:13px 22px;background:#6f3045;color:#ffffff;text-decoration:none;font-family:Arial,sans-serif;font-size:14px;font-weight:bold;">Leave a review</a></p>`
+    : "";
+
+  return sendEmail(
+    booking.userEmail,
+    `How was your Luxe & Lace rental?`,
+    `${greeting}\n\nThank you again for renting the ${booking.dressName} from Luxe & Lace. ${reviewMessage}\n\nBooking ID: ${booking.id}`,
+    luxeLaceTemplate("We would love your feedback", greeting, `<p>Thank you again for renting the <strong>${escapeHtml(booking.dressName)}</strong> from Luxe &amp; Lace.</p>${reviewButton}<p>${escapeHtml(reviewMessage)}</p><p style="font-family:Arial,sans-serif;font-size:13px;color:#756b66;">Booking ID: ${escapeHtml(booking.id)}</p>`)
   );
 }

@@ -6,6 +6,7 @@ import { isAdmin, unauthorized } from "@/lib/security";
 import {
   sendAdminBookingNotification,
   sendBookingConfirmation,
+  sendReviewRequest,
   sendRentalThankYou,
 } from "@/lib/automation";
 
@@ -218,12 +219,18 @@ export async function PATCH(request: Request) {
           await syncDressAvailability(data.dress_id);
         }
 
-        if (updates.status === "completed" && data && !data.completed_email_sent_at) {
+        if (updates.status === "completed" && data) {
           const completedBooking = normalizeBooking(data);
-          if (await sendRentalThankYou(completedBooking)) {
+          if (!data.completed_email_sent_at && await sendRentalThankYou(completedBooking)) {
             await supabaseAdmin
               .from("bookings")
               .update({ completed_email_sent_at: new Date().toISOString() })
+              .eq("id", body.id);
+          }
+          if (!data.review_email_sent_at && await sendReviewRequest(completedBooking)) {
+            await supabaseAdmin
+              .from("bookings")
+              .update({ review_email_sent_at: new Date().toISOString() })
               .eq("id", body.id);
           }
         }

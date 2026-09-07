@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import {
   sendOverdueReminder,
   sendReturnReminder,
+  sendReviewRequest,
   sendRentalThankYou,
 } from "@/lib/automation";
 import type { Booking } from "@/types";
@@ -160,11 +161,34 @@ export async function GET(request: Request) {
     }
   }
 
+  const { data: reviewDue, error: reviewError } = await supabaseAdmin
+    .from("bookings")
+    .select("*")
+    .eq("status", "completed")
+    .is("review_email_sent_at", null);
+
+  if (reviewError) {
+    return NextResponse.json({ error: reviewError.message }, { status: 500 });
+  }
+
+  let reviewEmailsSent = 0;
+  for (const row of reviewDue || []) {
+    const booking = normalizeBooking(row);
+    if (await sendReviewRequest(booking)) {
+      await supabaseAdmin
+        .from("bookings")
+        .update({ review_email_sent_at: now.toISOString() })
+        .eq("id", booking.id);
+      reviewEmailsSent += 1;
+    }
+  }
+
   return NextResponse.json({
     expiredUnpaidBookings: expiredIds.length,
     returnRemindersSent,
     overdueRemindersSent,
     completedBookings: completedIds.length,
     thankYouEmailsSent,
+    reviewEmailsSent,
   });
 }
