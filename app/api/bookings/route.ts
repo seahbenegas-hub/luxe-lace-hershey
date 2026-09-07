@@ -3,6 +3,7 @@ import { bookings, addBooking, updateBooking } from "@/lib/db";
 import { supabase, supabaseAdmin } from "@/lib/supabase";
 import type { Booking } from "@/types";
 import { isAdmin, unauthorized } from "@/lib/security";
+import { sendAdminBookingNotification, sendBookingConfirmation } from "@/lib/automation";
 
 const validStatuses = ["pending", "confirmed", "completed", "cancelled"] as const;
 const validPaymentStatuses = ["pending", "paid", "refunded"] as const;
@@ -112,7 +113,12 @@ export async function POST(request: Request) {
       }
 
       if (data) {
-        return NextResponse.json(normalizeBooking(data), { status: 201 });
+        const normalized = normalizeBooking(data);
+        await Promise.all([
+          sendBookingConfirmation(normalized),
+          sendAdminBookingNotification(normalized),
+        ]);
+        return NextResponse.json(normalized, { status: 201 });
       }
     } else {
       console.error("❌ supabaseAdmin client not initialized");
@@ -136,6 +142,10 @@ export async function POST(request: Request) {
     };
 
     addBooking(legacyBooking);
+    await Promise.all([
+      sendBookingConfirmation(legacyBooking),
+      sendAdminBookingNotification(legacyBooking),
+    ]);
     return NextResponse.json(legacyBooking, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Invalid booking payload" }, { status: 400 });
