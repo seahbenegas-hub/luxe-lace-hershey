@@ -379,13 +379,14 @@ export default function AdminPage() {
   const stats = {
     totalBookings: bookings.length,
     totalRevenue: bookings.filter((b) => b.paymentStatus === "paid").reduce((sum, b) => sum + b.totalPrice, 0),
-    activeRentals: bookings.filter((b) => b.status === "confirmed").length,
+    activeRentals: bookings.filter((b) => b.status === "confirmed" || b.status === "inprogress").length,
     totalDresses: dresses.length,
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "confirmed": return <CheckCircle className="w-4 h-4 text-green-500" />;
+      case "inprogress": return <Package className="w-4 h-4 text-orange-500" />;
       case "pending": return <Clock className="w-4 h-4 text-yellow-500" />;
       case "completed": return <Package className="w-4 h-4 text-blue-500" />;
       case "cancelled": return <XCircle className="w-4 h-4 text-red-500" />;
@@ -526,6 +527,7 @@ export default function AdminPage() {
                         <td className="py-3 px-4">
                           <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
                             booking.status === "confirmed" ? "bg-green-50 text-green-700" :
+                            booking.status === "inprogress" ? "bg-orange-50 text-orange-700" :
                             booking.status === "pending" ? "bg-yellow-50 text-yellow-700" :
                             booking.status === "completed" ? "bg-blue-50 text-blue-700" :
                             "bg-red-50 text-red-700"
@@ -591,6 +593,7 @@ export default function AdminPage() {
                       <td className="py-3 px-4">
                         <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
                           booking.status === "confirmed" ? "bg-green-50 text-green-700" :
+                          booking.status === "inprogress" ? "bg-orange-50 text-orange-700" :
                           booking.status === "pending" ? "bg-yellow-50 text-yellow-700" :
                           booking.status === "completed" ? "bg-blue-50 text-blue-700" :
                           "bg-red-50 text-red-700"
@@ -611,13 +614,21 @@ export default function AdminPage() {
                           )}
                           {booking.status === "confirmed" && (
                             <button
+                              onClick={() => updateBookingStatus(booking.id, "inprogress")}
+                              className="px-2 py-1 bg-orange-50 text-orange-600 rounded text-xs font-medium hover:bg-orange-100"
+                            >
+                              Start Rental
+                            </button>
+                          )}
+                          {booking.status === "inprogress" && (
+                            <button
                               onClick={() => updateBookingStatus(booking.id, "completed")}
                               className="px-2 py-1 bg-blue-50 text-blue-600 rounded text-xs font-medium hover:bg-blue-100"
                             >
-                              Complete
+                              Mark Received
                             </button>
                           )}
-                          {(booking.status === "pending" || booking.status === "confirmed") && (
+                          {(booking.status === "pending" || booking.status === "confirmed" || booking.status === "inprogress") && (
                             <button
                               onClick={() => updateBookingStatus(booking.id, "cancelled")}
                               className="px-2 py-1 bg-red-50 text-red-600 rounded text-xs font-medium hover:bg-red-100"

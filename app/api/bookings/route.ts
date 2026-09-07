@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { bookings, addBooking, updateBooking } from "@/lib/db";
+import { bookings, dresses, addBooking, updateBooking } from "@/lib/db";
 import { supabase, supabaseAdmin } from "@/lib/supabase";
 import type { Booking } from "@/types";
 import { isAdmin, unauthorized } from "@/lib/security";
@@ -9,7 +9,7 @@ import {
   sendRentalThankYou,
 } from "@/lib/automation";
 
-const validStatuses = ["pending", "confirmed", "completed", "cancelled"] as const;
+const validStatuses = ["pending", "confirmed", "inprogress", "completed", "cancelled"] as const;
 const validPaymentStatuses = ["pending", "paid", "refunded"] as const;
 
 function normalizeBooking(row: any): Booking {
@@ -30,6 +30,30 @@ function normalizeBooking(row: any): Booking {
     qrCode: row.qr_code || row.qrCode,
     paymentReceipt: row.payment_receipt || row.paymentReceipt || undefined,
   };
+}
+
+async function syncDressAvailability(dressId: string) {
+  if (supabaseAdmin) {
+    const { data, error } = await supabaseAdmin
+      .from("bookings")
+      .select("id")
+      .eq("dress_id", dressId)
+      .in("status", ["pending", "confirmed", "inprogress"]);
+
+    if (!error) {
+      await supabaseAdmin.from("dresses").update({ available: (data || []).length === 0 }).eq("id", dressId);
+      return;
+    }
+
+    console.error("Supabase inventory availability query error:", error);
+  }
+
+  const dress = dresses.find((item) => item.id === dressId);
+  if (dress) {
+    dress.available = !bookings.some(
+      (booking) => booking.dressId === dressId && ["pending", "confirmed", "inprogress"].includes(booking.status)
+    );
+  }
 }
 
 export async function GET(request: Request) {
@@ -118,6 +142,7 @@ export async function POST(request: Request) {
 
       if (data) {
         const normalized = normalizeBooking(data);
+        await syncDressAvailability(normalized.dressId);
         await Promise.all([
           sendBookingConfirmation(normalized),
           sendAdminBookingNotification(normalized),
@@ -146,6 +171,7 @@ export async function POST(request: Request) {
     };
 
     addBooking(legacyBooking);
+    await syncDressAvailability(legacyBooking.dressId);
     await Promise.all([
       sendBookingConfirmation(legacyBooking),
       sendAdminBookingNotification(legacyBooking),
@@ -188,6 +214,10 @@ export async function PATCH(request: Request) {
         .single();
 
       if (!error) {
+        if (data) {
+          await syncDressAvailability(data.dress_id);
+        }
+
         if (updates.status === "completed" && data && !data.completed_email_sent_at) {
           const completedBooking = normalizeBooking(data);
           if (await sendRentalThankYou(completedBooking)) {
@@ -220,9 +250,13 @@ export async function DELETE(request: Request) {
     }
 
     if (supabaseAdmin) {
+      const { data: booking } = await supabaseAdmin.from("bookings").select("dress_id").eq("id", id).maybeSingle();
       const { error } = await supabaseAdmin.from("bookings").delete().eq("id", id);
 
       if (!error) {
+        if (booking?.dress_id) {
+          await syncDressAvailability(booking.dress_id);
+        }
         return NextResponse.json({ success: true });
       }
 

@@ -23,7 +23,7 @@ export interface Booking {
   startDate: string;
   endDate: string;
   totalPrice: number;
-  status: "pending" | "confirmed" | "completed" | "cancelled";
+  status: "pending" | "confirmed" | "inprogress" | "completed" | "cancelled";
   paymentStatus: "pending" | "paid" | "refunded";
   createdAt: string;
   qrCode?: string;
