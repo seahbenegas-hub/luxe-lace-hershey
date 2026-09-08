@@ -438,28 +438,28 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-paper">
       {/* Admin Header */}
-      <header className="bg-ink text-paper border-b border-ink sticky top-0 z-40">
+      <header className="bg-paper-deep/80 text-ink border-b border-ink/10 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-0 sm:h-16 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
-              <LayoutDashboard className="w-6 h-6 text-brass shrink-0" />
-              <h1 className="text-base sm:text-lg font-semibold truncate">Admin Dashboard</h1>
+              <LayoutDashboard className="w-6 h-6 text-wine shrink-0" />
+              <h1 className="text-base sm:text-lg font-semibold tracking-tight truncate">Admin Dashboard</h1>
             </div>
           </div>
           <div className="flex items-center justify-between gap-2 sm:gap-3 flex-wrap">
-            <span className="text-xs sm:text-sm text-paper-deep truncate max-w-[140px] sm:max-w-none">{adminName}</span>
+            <span className="text-xs sm:text-sm text-stone truncate max-w-[140px] sm:max-w-none">{adminName}</span>
             <div className="flex items-center gap-2 sm:gap-3">
               <button
                 onClick={refreshBookings}
                 disabled={loading}
-                className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm bg-paper/10 text-paper hover:bg-paper/20 rounded-lg transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm bg-paper text-wine border border-ink/10 hover:bg-white rounded-lg transition-colors disabled:opacity-50"
               >
                 <TrendingUp className="w-4 h-4" />
                 Refresh
               </button>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm text-paper-deep hover:bg-paper/10 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm text-wine-soft hover:bg-wine/10 rounded-lg transition-colors"
               >
                 <LogOut className="w-4 h-4" />
                 Sign Out
