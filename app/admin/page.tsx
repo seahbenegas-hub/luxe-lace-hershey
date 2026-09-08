@@ -436,30 +436,30 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-secondary-50">
+    <div className="min-h-screen bg-paper">
       {/* Admin Header */}
-      <header className="bg-white border-b border-secondary-200 sticky top-0 z-40">
+      <header className="bg-ink text-paper border-b border-ink sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-0 sm:h-16 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
-              <LayoutDashboard className="w-6 h-6 text-primary-600 shrink-0" />
-              <h1 className="text-base sm:text-lg font-bold text-secondary-900 truncate">Admin Dashboard</h1>
+              <LayoutDashboard className="w-6 h-6 text-brass shrink-0" />
+              <h1 className="text-base sm:text-lg font-semibold truncate">Admin Dashboard</h1>
             </div>
           </div>
           <div className="flex items-center justify-between gap-2 sm:gap-3 flex-wrap">
-            <span className="text-xs sm:text-sm text-secondary-600 truncate max-w-[140px] sm:max-w-none">{adminName}</span>
+            <span className="text-xs sm:text-sm text-paper-deep truncate max-w-[140px] sm:max-w-none">{adminName}</span>
             <div className="flex items-center gap-2 sm:gap-3">
               <button
                 onClick={refreshBookings}
                 disabled={loading}
-                className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm bg-paper-deep text-wine hover:bg-paper rounded-lg transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm bg-paper/10 text-paper hover:bg-paper/20 rounded-lg transition-colors disabled:opacity-50"
               >
                 <TrendingUp className="w-4 h-4" />
                 Refresh
               </button>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm text-wine-soft hover:bg-wine/10 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm text-paper-deep hover:bg-paper/10 rounded-lg transition-colors"
               >
                 <LogOut className="w-4 h-4" />
                 Sign Out
@@ -475,7 +475,7 @@ export default function AdminPage() {
         )}
 
         {/* Tabs */}
-        <div className="flex flex-wrap gap-2 mb-8">
+        <div className="flex flex-wrap gap-1 mb-10 border-b border-ink/15 pb-1">
           {[
             { id: "overview", label: "Overview", icon: LayoutDashboard },
             { id: "bookings", label: "Bookings", icon: ShoppingBag },
@@ -484,10 +484,10 @@ export default function AdminPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as typeof activeTab)}
-              className={`flex flex-1 items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors min-w-[110px] ${
+                className={`flex flex-1 items-center justify-center gap-2 px-4 py-3 text-sm font-semibold transition-colors min-w-[110px] ${
                 activeTab === tab.id
-                  ? "bg-primary-600 text-white"
-                  : "bg-white text-secondary-600 hover:bg-secondary-100 border border-secondary-200"
+                  ? "border-b-2 border-wine text-wine"
+                  : "text-stone hover:text-ink"
               }`}
             >
               <tab.icon className="w-4 h-4" />
@@ -506,17 +506,17 @@ export default function AdminPage() {
                 { label: "Active Rentals", value: stats.activeRentals, icon: Clock, color: "bg-paper-deep text-stone" },
                 { label: "Total Dresses", value: stats.totalDresses, icon: Package, color: "bg-paper-deep text-wine-soft" },
               ].map((stat) => (
-                <div key={stat.label} className="bg-white rounded-2xl border border-secondary-200 p-6">
+                <div key={stat.label} className="border-t-2 border-ink/20 bg-paper-deep/45 p-5">
                   <div className={`w-10 h-10 ${stat.color} rounded-xl flex items-center justify-center mb-4`}>
                     <stat.icon className="w-5 h-5" />
                   </div>
-                  <p className="text-2xl font-bold text-secondary-900">{stat.value}</p>
-                  <p className="text-sm text-secondary-500">{stat.label}</p>
+                  <p className="text-3xl font-semibold text-ink">{stat.value}</p>
+                  <p className="text-sm text-stone">{stat.label}</p>
                 </div>
               ))}
             </div>
 
-            <div className="bg-white rounded-2xl border border-secondary-200 p-6">
+            <div className="border-t-2 border-ink/20 bg-paper-deep/35 p-6">
               <h2 className="text-lg font-semibold text-secondary-900 mb-4">Recent Bookings</h2>
               <div className="overflow-x-auto -mx-1 px-1 pb-2">
                 <table className="w-full min-w-[640px] text-sm">
@@ -542,11 +542,11 @@ export default function AdminPage() {
                         <td className="py-3 px-4 font-medium text-primary-600">{formatPrice(booking.totalPrice)}</td>
                         <td className="py-3 px-4">
                           <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                            booking.status === "confirmed" ? "bg-green-50 text-green-700" :
-                            booking.status === "inprogress" ? "bg-orange-50 text-orange-700" :
-                            booking.status === "pending" ? "bg-yellow-50 text-yellow-700" :
-                            booking.status === "completed" ? "bg-blue-50 text-blue-700" :
-                            "bg-red-50 text-red-700"
+                            booking.status === "confirmed" ? "bg-paper-deep text-wine" :
+                            booking.status === "inprogress" ? "bg-paper-deep text-brass" :
+                            booking.status === "pending" ? "bg-paper-deep text-stone" :
+                            booking.status === "completed" ? "bg-paper-deep text-stone" :
+                            "bg-wine/10 text-wine"
                           }`}>
                             {getStatusIcon(booking.status)}
                             {getStatusLabel(booking.status)}
@@ -563,7 +563,7 @@ export default function AdminPage() {
 
         {/* Bookings */}
         {activeTab === "bookings" && (
-          <div className="bg-white rounded-2xl border border-secondary-200 p-6">
+          <div className="border-t-2 border-ink/20 bg-paper-deep/35 p-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
               <h2 className="text-lg font-semibold text-secondary-900">All Bookings</h2>
               <div className="relative w-full sm:w-64">
@@ -608,11 +608,11 @@ export default function AdminPage() {
                       <td className="py-3 px-4">{renderReceipt(booking)}</td>
                       <td className="py-3 px-4">
                         <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                          booking.status === "confirmed" ? "bg-green-50 text-green-700" :
-                          booking.status === "inprogress" ? "bg-orange-50 text-orange-700" :
-                          booking.status === "pending" ? "bg-yellow-50 text-yellow-700" :
-                          booking.status === "completed" ? "bg-blue-50 text-blue-700" :
-                          "bg-red-50 text-red-700"
+                          booking.status === "confirmed" ? "bg-paper-deep text-wine" :
+                          booking.status === "inprogress" ? "bg-paper-deep text-brass" :
+                          booking.status === "pending" ? "bg-paper-deep text-stone" :
+                          booking.status === "completed" ? "bg-paper-deep text-stone" :
+                          "bg-wine/10 text-wine"
                         }`}>
                           {getStatusIcon(booking.status)}
                           {getStatusLabel(booking.status)}
@@ -623,7 +623,7 @@ export default function AdminPage() {
                           {booking.status === "pending" && (
                             <button
                               onClick={() => updateBookingStatus(booking.id, "confirmed")}
-                              className="px-2 py-1 bg-green-50 text-green-600 rounded text-xs font-medium hover:bg-green-100"
+                              className="px-2 py-1 bg-paper-deep text-wine rounded text-xs font-medium hover:bg-paper"
                             >
                               Confirm
                             </button>
@@ -631,7 +631,7 @@ export default function AdminPage() {
                           {booking.status === "confirmed" && (
                             <button
                               onClick={() => updateBookingStatus(booking.id, "inprogress")}
-                              className="px-2 py-1 bg-orange-50 text-orange-600 rounded text-xs font-medium hover:bg-orange-100"
+                              className="px-2 py-1 bg-paper-deep text-brass rounded text-xs font-medium hover:bg-paper"
                             >
                               Start Rental
                             </button>
@@ -639,7 +639,7 @@ export default function AdminPage() {
                           {booking.status === "inprogress" && (
                             <button
                               onClick={() => updateBookingStatus(booking.id, "completed")}
-                              className="px-2 py-1 bg-blue-50 text-blue-600 rounded text-xs font-medium hover:bg-blue-100"
+                              className="px-2 py-1 bg-paper-deep text-stone rounded text-xs font-medium hover:bg-paper"
                             >
                               Mark Received
                             </button>
@@ -647,14 +647,14 @@ export default function AdminPage() {
                           {(booking.status === "pending" || booking.status === "confirmed" || booking.status === "inprogress") && (
                             <button
                               onClick={() => updateBookingStatus(booking.id, "cancelled")}
-                              className="px-2 py-1 bg-red-50 text-red-600 rounded text-xs font-medium hover:bg-red-100"
+                              className="px-2 py-1 bg-wine/10 text-wine rounded text-xs font-medium hover:bg-wine/20"
                             >
                               Cancel
                             </button>
                           )}
                           <button
                             onClick={() => deleteBooking(booking.id)}
-                            className="inline-flex items-center gap-1 px-2 py-1 bg-red-50 text-red-700 rounded text-xs font-medium hover:bg-red-100"
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-wine/10 text-wine rounded text-xs font-medium hover:bg-wine/20"
                           >
                             <Trash2 className="w-3 h-3" /> Delete
                           </button>
@@ -670,7 +670,7 @@ export default function AdminPage() {
 
         {/* Inventory */}
         {activeTab === "inventory" && (
-          <div className="bg-white rounded-2xl border border-secondary-200 p-6">
+          <div className="border-t-2 border-ink/20 bg-paper-deep/35 p-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
               <h2 className="text-lg font-semibold text-secondary-900">Dress Inventory</h2>
               <button
@@ -682,7 +682,7 @@ export default function AdminPage() {
             </div>
 
             {inventoryError && (
-              <p className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{inventoryError}</p>
+              <p className="mb-4 rounded-lg bg-wine/10 px-4 py-3 text-sm text-wine">{inventoryError}</p>
             )}
 
             {isAddingNew && editForm && (
@@ -760,7 +760,7 @@ export default function AdminPage() {
                     </label>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <button onClick={saveDressEdits} disabled={imageUploading} className="inline-flex items-center gap-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50"> <Save className="w-4 h-4" /> Save Dress </button>
+                    <button onClick={saveDressEdits} disabled={imageUploading} className="inline-flex items-center gap-1 px-3 py-2 bg-wine text-paper rounded-lg text-sm font-medium hover:bg-wine-soft disabled:opacity-50"> <Save className="w-4 h-4" /> Save Dress </button>
                     <button onClick={cancelEditDress} className="inline-flex items-center gap-1 px-3 py-2 bg-secondary-200 text-secondary-700 rounded-lg text-sm font-medium hover:bg-secondary-300"> <X className="w-4 h-4" /> Cancel </button>
                   </div>
                 </div>
@@ -868,7 +868,7 @@ export default function AdminPage() {
                             </label>
                           ) : (
                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              dress.featured ? "bg-pink-50 text-pink-700" : "bg-secondary-100 text-secondary-500"
+                              dress.featured ? "bg-paper-deep text-wine" : "bg-secondary-100 text-secondary-500"
                             }`}>
                               {dress.featured ? "Featured" : "No"}
                             </span>
@@ -886,7 +886,7 @@ export default function AdminPage() {
                             </label>
                           ) : (
                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              dress.available ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+                              dress.available ? "bg-paper-deep text-wine" : "bg-wine/10 text-wine"
                             }`}>
                               {dress.available ? "Available" : "Unavailable"}
                             </span>
@@ -897,7 +897,7 @@ export default function AdminPage() {
                             <div className="flex gap-2">
                               <button
                                 onClick={saveDressEdits}
-                                className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 rounded text-xs font-medium hover:bg-green-100"
+                                className="inline-flex items-center gap-1 px-2 py-1 bg-paper-deep text-wine rounded text-xs font-medium hover:bg-paper"
                               >
                                 <Save className="w-3 h-3" /> Save
                               </button>
@@ -918,7 +918,7 @@ export default function AdminPage() {
                               </button>
                               <button
                                 onClick={() => deleteDress(dress.id)}
-                                className="inline-flex items-center gap-1 px-2 py-1 bg-red-50 text-red-700 rounded text-xs font-medium hover:bg-red-100"
+                                className="inline-flex items-center gap-1 px-2 py-1 bg-wine/10 text-wine rounded text-xs font-medium hover:bg-wine/20"
                               >
                                 <Trash2 className="w-3 h-3" /> Delete
                               </button>
