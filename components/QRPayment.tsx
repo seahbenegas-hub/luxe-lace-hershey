@@ -85,8 +85,8 @@ export default function QRPayment({ amount, bookingId, onSuccess }: QRPaymentPro
         </div>
       ) : (
         <div className="space-y-4 text-center">
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto" />
-          <h4 className="text-lg font-semibold text-green-600">Receipt Submitted!</h4>
+          <CheckCircle className="w-16 h-16 text-wine mx-auto" />
+          <h4 className="text-lg font-semibold text-wine">Receipt Submitted!</h4>
           <p className="text-secondary-500">Your booking is now waiting for confirmation.</p>
         </div>
       )}

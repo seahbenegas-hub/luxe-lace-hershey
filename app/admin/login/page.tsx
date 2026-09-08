@@ -52,7 +52,7 @@ export default function AdminLoginPage() {
 
         <div className="bg-white rounded-2xl border border-secondary-200 p-8 shadow-sm">
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-red-600 text-sm">
+            <div className="mb-6 p-4 bg-wine/10 border border-wine/20 rounded-xl flex items-center gap-2 text-wine text-sm">
               <AlertCircle className="w-4 h-4" />
               {error}
             </div>

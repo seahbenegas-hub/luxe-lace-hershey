@@ -35,20 +35,20 @@ export default function MyRentalsPage() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "confirmed": return <CheckCircle className="w-5 h-5 text-green-500" />;
-      case "pending": return <Clock className="w-5 h-5 text-yellow-500" />;
-      case "completed": return <Package className="w-5 h-5 text-blue-500" />;
-      case "cancelled": return <XCircle className="w-5 h-5 text-red-500" />;
+      case "confirmed": return <CheckCircle className="w-5 h-5 text-wine" />;
+      case "pending": return <Clock className="w-5 h-5 text-brass" />;
+      case "completed": return <Package className="w-5 h-5 text-stone" />;
+      case "cancelled": return <XCircle className="w-5 h-5 text-wine-soft" />;
       default: return <Clock className="w-5 h-5 text-secondary-400" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "confirmed": return "bg-green-50 text-green-700 border-green-200";
-      case "pending": return "bg-yellow-50 text-yellow-700 border-yellow-200";
-      case "completed": return "bg-blue-50 text-blue-700 border-blue-200";
-      case "cancelled": return "bg-red-50 text-red-700 border-red-200";
+      case "confirmed": return "bg-paper-deep text-wine border-wine/30";
+      case "pending": return "bg-paper-deep text-brass border-brass/30";
+      case "completed": return "bg-paper-deep text-stone border-stone/30";
+      case "cancelled": return "bg-wine/10 text-wine border-wine/30";
       default: return "bg-secondary-50 text-secondary-700 border-secondary-200";
     }
   };

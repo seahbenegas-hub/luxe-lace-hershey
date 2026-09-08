@@ -395,11 +395,11 @@ export default function AdminPage() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "confirmed": return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case "inprogress": return <Package className="w-4 h-4 text-orange-500" />;
-      case "pending": return <Clock className="w-4 h-4 text-yellow-500" />;
-      case "completed": return <Package className="w-4 h-4 text-blue-500" />;
-      case "cancelled": return <XCircle className="w-4 h-4 text-red-500" />;
+      case "confirmed": return <CheckCircle className="w-4 h-4 text-wine" />;
+      case "inprogress": return <Package className="w-4 h-4 text-brass" />;
+      case "pending": return <Clock className="w-4 h-4 text-stone" />;
+      case "completed": return <Package className="w-4 h-4 text-stone" />;
+      case "cancelled": return <XCircle className="w-4 h-4 text-wine-soft" />;
       default: return <Clock className="w-4 h-4" />;
     }
   };
@@ -452,14 +452,14 @@ export default function AdminPage() {
               <button
                 onClick={refreshBookings}
                 disabled={loading}
-                className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm bg-paper-deep text-wine hover:bg-paper rounded-lg transition-colors disabled:opacity-50"
               >
                 <TrendingUp className="w-4 h-4" />
                 Refresh
               </button>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 py-2 text-xs sm:text-sm text-wine-soft hover:bg-wine/10 rounded-lg transition-colors"
               >
                 <LogOut className="w-4 h-4" />
                 Sign Out
@@ -471,7 +471,7 @@ export default function AdminPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {bookingsError && (
-          <p className="mb-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">Bookings could not be loaded: {bookingsError}</p>
+          <p className="mb-6 rounded-lg bg-wine/10 px-4 py-3 text-sm text-wine">Bookings could not be loaded: {bookingsError}</p>
         )}
 
         {/* Tabs */}
@@ -501,10 +501,10 @@ export default function AdminPage() {
           <div className="space-y-8">
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { label: "Total Bookings", value: stats.totalBookings, icon: ShoppingBag, color: "bg-blue-50 text-blue-600" },
-                { label: "Revenue", value: formatPrice(stats.totalRevenue), icon: TrendingUp, color: "bg-green-50 text-green-600" },
-                { label: "Active Rentals", value: stats.activeRentals, icon: Clock, color: "bg-yellow-50 text-yellow-600" },
-                { label: "Total Dresses", value: stats.totalDresses, icon: Package, color: "bg-purple-50 text-purple-600" },
+                { label: "Total Bookings", value: stats.totalBookings, icon: ShoppingBag, color: "bg-paper-deep text-wine" },
+                { label: "Revenue", value: formatPrice(stats.totalRevenue), icon: TrendingUp, color: "bg-paper-deep text-brass" },
+                { label: "Active Rentals", value: stats.activeRentals, icon: Clock, color: "bg-paper-deep text-stone" },
+                { label: "Total Dresses", value: stats.totalDresses, icon: Package, color: "bg-paper-deep text-wine-soft" },
               ].map((stat) => (
                 <div key={stat.label} className="bg-white rounded-2xl border border-secondary-200 p-6">
                   <div className={`w-10 h-10 ${stat.color} rounded-xl flex items-center justify-center mb-4`}>

@@ -241,7 +241,7 @@ function BookingPageContent() {
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-red-600">
+          <div className="mb-6 p-4 bg-wine/10 border border-wine/20 rounded-xl flex items-center gap-2 text-wine">
           <AlertCircle className="w-5 h-5" />
           {error}
         </div>
@@ -417,8 +417,8 @@ function BookingPageContent() {
       {/* Step 4: Confirmed */}
       {step === "confirmed" && (
         <div className="bg-white rounded-2xl border border-secondary-200 p-8 text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-10 h-10 text-green-600" />
+          <div className="w-20 h-20 bg-paper-deep rounded-full flex items-center justify-center mx-auto mb-6">
+            <CheckCircle className="w-10 h-10 text-wine" />
           </div>
           <h2 className="text-2xl font-bold text-secondary-900 mb-2">Booking Confirmed!</h2>
           <p className="text-secondary-500 mb-6">
@@ -449,7 +449,7 @@ function BookingPageContent() {
               </div>
               <div>
                 <p className="text-secondary-400">Receipt</p>
-                <p className="font-medium text-green-600">Uploaded</p>
+                <p className="font-medium text-wine">Uploaded</p>
               </div>
             </div>
           </div>

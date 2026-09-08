@@ -12,7 +12,7 @@ export default function GoogleSignIn({ onSuccess, onError }: GoogleSignInProps) 
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
   if (!clientId) {
-    return <p className="text-red-600 text-sm">Google Client ID not configured</p>;
+    return <p className="text-wine text-sm">Google Client ID not configured</p>;
   }
 
   const handleSuccess = (credentialResponse: any) => {

@@ -5,31 +5,31 @@ const steps = [
     icon: Search,
     title: "Browse & Select",
     description: "Explore our curated collection of designer dresses. Filter by size, color, occasion, and price to find your perfect match.",
-    color: "bg-blue-50 text-blue-600",
+    color: "bg-paper-deep text-wine",
   },
   {
     icon: Calendar,
     title: "Choose Your Dates",
     description: "Select your rental period using our easy booking calendar. Rent for a day, weekend, or full week.",
-    color: "bg-purple-50 text-purple-600",
+    color: "bg-paper-deep text-wine-soft",
   },
   {
     icon: CreditCard,
     title: "Upload Payment Receipt",
     description: "After making your payment, upload a screenshot or photo of the receipt so we can confirm your booking quickly.",
-    color: "bg-green-50 text-green-600",
+    color: "bg-paper-deep text-brass",
   },
   {
     icon: Truck,
     title: "Delivery",
     description: "We deliver the dress to your door, professionally cleaned and ready to wear. Return using the prepaid packaging.",
-    color: "bg-orange-50 text-orange-600",
+    color: "bg-paper-deep text-stone",
   },
   {
     icon: Sparkles,
     title: "Return & Repeat",
     description: "After your event, simply pack the dress and schedule a pickup. No dry cleaning needed - we handle everything!",
-    color: "bg-pink-50 text-pink-600",
+    color: "bg-paper-deep text-wine",
   },
 ];
 

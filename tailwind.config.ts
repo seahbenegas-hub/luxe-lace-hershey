@@ -42,7 +42,8 @@ const config: Config = {
         }
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["Manrope", "sans-serif"],
+        serif: ["Newsreader", "Georgia", "serif"],
       },
     },
   },
