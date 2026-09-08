@@ -9,6 +9,13 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        ink: "#221E1A",
+        paper: "#F3EEE4",
+        "paper-deep": "#EAE2D2",
+        wine: "#6B2233",
+        "wine-soft": "#8B3B4E",
+        brass: "#A9863F",
+        stone: "#8A7F72",
         primary: {
           50: "#fdf2f8",
           100: "#fce7f3",

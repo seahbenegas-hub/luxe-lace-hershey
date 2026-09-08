@@ -215,8 +215,9 @@ function BookingPageContent() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold text-secondary-900 mb-8">Book Your Dress</h1>
+    <div className="mx-auto max-w-6xl">
+      <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-wine-soft">Reserve your look</p>
+      <h1 className="mb-10 text-5xl italic text-ink">Book Your Dress</h1>
 
       {/* Progress */}
       <div className="flex items-center gap-2 mb-8">
@@ -249,7 +250,7 @@ function BookingPageContent() {
       {/* Step 1: Select Dress & Dates */}
       {step === "select" && (
         <div className="space-y-8">
-          <div className="bg-white rounded-2xl border border-secondary-200 p-6">
+          <div className="bg-paper-deep/40 rounded-2xl border border-ink/10 p-6">
             <h2 className="text-lg font-semibold text-secondary-900 mb-4">1. Select a Dress</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto p-2">
               {dresses.map((dress) => (
@@ -274,7 +275,7 @@ function BookingPageContent() {
           </div>
 
           {selectedDress && (
-            <div className="bg-white rounded-2xl border border-secondary-200 p-6">
+            <div className="bg-paper-deep/40 rounded-2xl border border-ink/10 p-6">
               <h2 className="text-lg font-semibold text-secondary-900 mb-4">2. Select Rental Dates</h2>
               <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
@@ -334,7 +335,7 @@ function BookingPageContent() {
       {/* Step 2: Details */}
       {step === "details" && selectedDress && (
         <div className="space-y-6">
-          <div className="bg-white rounded-2xl border border-secondary-200 p-6">
+          <div className="sticky top-24 bg-paper-deep/70 rounded-2xl border border-ink/10 p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-secondary-900 mb-4">Rental Summary</h2>
             <div className="flex gap-4 mb-4">
               <div className="relative w-24 h-32 rounded-lg overflow-hidden flex-shrink-0">

@@ -56,13 +56,13 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-secondary-200">
+    <nav className="sticky top-0 z-50 border-b border-ink/10 bg-paper/90 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <ShoppingBag className="w-8 h-8 text-primary-600" />
-            <span className="text-xl font-bold text-secondary-900">Luxe & Lace — Hershey</span>
+            <ShoppingBag className="w-8 h-8 text-wine" />
+            <span className="text-xl font-semibold tracking-tight text-ink">Luxe & Lace — Hershey</span>
           </Link>
 
           {/* Desktop Nav */}

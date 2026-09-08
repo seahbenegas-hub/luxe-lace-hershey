@@ -48,9 +48,10 @@ export default function CatalogPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-secondary-900">Dress Catalog</h1>
-        <p className="text-secondary-500 mt-1">
+      <div className="mb-10 max-w-2xl">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-wine-soft">The collection</p>
+        <h1 className="text-5xl italic text-ink">Dress Catalog</h1>
+        <p className="mt-3 text-stone">
           Browse our collection of {dresses.length} premium dresses
         </p>
       </div>
@@ -72,9 +73,11 @@ export default function CatalogPage() {
           </button>
         </div>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filtered.map((dress) => (
-            <DressCard key={dress.id} dress={dress} />
+        <div className="columns-1 gap-6 sm:columns-2 lg:columns-3 xl:columns-4">
+          {filtered.map((dress, index) => (
+            <div key={dress.id} className={`mb-6 break-inside-avoid ${index % 3 === 1 ? "lg:pt-12" : index % 3 === 2 ? "lg:pt-6" : ""}`}>
+              <DressCard dress={dress} />
+            </div>
           ))}
         </div>
       )}

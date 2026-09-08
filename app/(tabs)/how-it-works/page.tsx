@@ -35,33 +35,26 @@ const steps = [
 
 export default function HowItWorksPage() {
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="text-center mb-16">
-        <h1 className="text-4xl font-bold text-secondary-900 mb-4">How It Works</h1>
-        <p className="text-lg text-secondary-500">
+    <div className="mx-auto max-w-5xl">
+      <div className="mb-16 max-w-2xl">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-wine-soft">The ritual</p>
+        <h1 className="text-5xl italic text-ink mb-4">How It Works</h1>
+        <p className="text-lg text-stone">
           Renting your dream dress is simple and hassle-free
         </p>
       </div>
 
-      <div className="space-y-12">
+      <div className="relative space-y-0 border-l border-wine/25 ml-5 md:ml-8">
         {steps.map((step, index) => (
           <div
             key={step.title}
-            className="flex flex-col md:flex-row gap-6 items-start bg-white rounded-2xl border border-secondary-200 p-8 hover:shadow-lg transition-shadow"
+            className="relative flex gap-6 pb-14 pl-10 md:pl-14"
           >
-            <div className="flex-shrink-0">
-              <div className={`w-16 h-16 ${step.color} rounded-2xl flex items-center justify-center`}>
-                <step.icon className="w-8 h-8" />
-              </div>
-            </div>
+            <span className="absolute -left-5 top-0 flex h-10 w-10 items-center justify-center rounded-full bg-wine text-sm font-semibold text-paper ring-8 ring-paper">{String(index + 1).padStart(2, "0")}</span>
             <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="w-8 h-8 bg-secondary-900 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                  {index + 1}
-                </span>
-                <h3 className="text-xl font-semibold text-secondary-900">{step.title}</h3>
-              </div>
-              <p className="text-secondary-500 leading-relaxed">{step.description}</p>
+              <div className="mb-3 flex items-center gap-3 text-wine-soft"><step.icon className="h-5 w-5" /><span className="text-xs font-semibold uppercase tracking-[0.2em]">Step {index + 1}</span></div>
+              <h3 className="text-3xl italic text-ink">{step.title}</h3>
+              <p className="mt-3 max-w-xl leading-relaxed text-stone">{step.description}</p>
             </div>
           </div>
         ))}

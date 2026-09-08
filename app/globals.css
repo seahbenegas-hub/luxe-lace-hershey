@@ -3,11 +3,34 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --ink: #221e1a;
+    --paper: #f3eee4;
+    --paper-deep: #eae2d2;
+    --wine: #6b2233;
+    --wine-soft: #8b3b4e;
+    --brass: #a9863f;
+    --stone: #8a7f72;
+  }
+
   html {
     scroll-behavior: smooth;
   }
   body {
-    @apply antialiased bg-secondary-50 text-secondary-900;
+    @apply antialiased;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-manrope), sans-serif;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-newsreader), Georgia, serif;
+    font-weight: 500;
+  }
+
+  ::selection {
+    background: var(--wine);
+    color: var(--paper);
   }
 }
 

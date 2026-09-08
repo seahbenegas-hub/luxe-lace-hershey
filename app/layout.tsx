@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Manrope, Newsreader } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 
-const inter = Inter({ subsets: ["latin"] });
+const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
+const newsreader = Newsreader({ subsets: ["latin"], variable: "--font-newsreader" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://luxe-lace-hershey.vercel.app"),
@@ -50,12 +51,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${manrope.variable} ${newsreader.variable}`}>
         <Navbar />
-        <main className="min-h-screen bg-secondary-50">{children}</main>
-        <footer className="border-t border-secondary-200 bg-white">
+        <main className="min-h-screen bg-paper">{children}</main>
+        <footer className="border-t border-ink/10 bg-paper-deep">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-wrap items-center justify-between gap-4 text-sm text-secondary-500">
-            <span>Luxe & Lace — Hershey</span>
+            <span className="font-semibold text-ink">Luxe & Lace — Hershey</span>
             <nav className="flex flex-wrap gap-4">
               <a href="/support" className="hover:text-primary-600">Support</a>
               <a href="/privacy" className="hover:text-primary-600">Privacy</a>
