@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowRight, Sparkles, Truck, Shield } from "lucide-react";
 import FeaturedDresses from "@/components/FeaturedDresses";
 
@@ -7,49 +6,9 @@ export default function HomePage() {
 
   return (
     <div className="space-y-20 pb-20">
-      {/* Hero Section */}
-      <section className="relative bg-secondary-900 text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <Image
-            src="https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=1920&auto=format&fit=crop"
-            alt="Hero background"
-            fill
-            sizes="100vw"
-            className="h-full w-full object-cover object-center"
-            priority
-          />
-        </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary-600/20 border border-primary-500/30 rounded-full text-primary-300 text-sm font-medium mb-6">
-              <Sparkles className="w-4 h-4" />
-              Premium Dress Rental
-            </div>
-            <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6">
-              Look Stunning for{" "}
-              <span className="text-primary-400">Every Occasion</span>
-            </h1>
-            <p className="text-lg text-secondary-300 mb-8 leading-relaxed">
-              Rent designer dresses at a fraction of the cost. From elegant gowns to 
-              cocktail dresses, find your perfect look without breaking the bank.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link
-                href="/catalog"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-colors"
-              >
-                Browse Collection
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                href="/how-it-works"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 text-white rounded-xl font-semibold hover:bg-white/20 transition-colors backdrop-blur-sm"
-              >
-                How It Works
-              </Link>
-            </div>
-          </div>
-        </div>
+      {/* Featured look carousel */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <FeaturedDresses />
       </section>
 
       {/* Features */}
@@ -102,7 +61,7 @@ export default function HomePage() {
             View All <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
-        <FeaturedDresses />
+        <FeaturedDresses variant="grid" />
       </section>
 
       {/* CTA Section */}
