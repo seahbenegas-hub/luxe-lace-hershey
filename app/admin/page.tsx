@@ -686,35 +686,35 @@ export default function AdminPage() {
             )}
 
             {isAddingNew && editForm && (
-              <div className="mb-6 rounded-xl border border-dashed border-primary-200 bg-primary-50 p-4 space-y-3">
+              <div className="mb-8 bg-paper-deep/35 p-5 sm:p-7 space-y-5">
                 <div className="grid md:grid-cols-2 gap-3">
-                  <input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} placeholder="Dress name" className="p-2 border border-secondary-200 rounded-lg" />
-                  <input value={editForm.category} onChange={(e) => setEditForm({ ...editForm, category: e.target.value })} placeholder="Category" className="p-2 border border-secondary-200 rounded-lg" />
-                  <input value={editForm.color} onChange={(e) => setEditForm({ ...editForm, color: e.target.value })} placeholder="Color" className="p-2 border border-secondary-200 rounded-lg" />
+                  <input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} placeholder="Dress name" className="bg-paper px-3 py-2.5 border border-ink/10 rounded-lg text-ink placeholder:text-stone/70 focus:outline-none focus:border-wine focus:ring-1 focus:ring-wine" />
+                  <input value={editForm.category} onChange={(e) => setEditForm({ ...editForm, category: e.target.value })} placeholder="Category" className="bg-paper px-3 py-2.5 border border-ink/10 rounded-lg text-ink placeholder:text-stone/70 focus:outline-none focus:border-wine focus:ring-1 focus:ring-wine" />
+                  <input value={editForm.color} onChange={(e) => setEditForm({ ...editForm, color: e.target.value })} placeholder="Color" className="bg-paper px-3 py-2.5 border border-ink/10 rounded-lg text-ink placeholder:text-stone/70 focus:outline-none focus:border-wine focus:ring-1 focus:ring-wine" />
                   <div className="grid grid-cols-2 gap-2 md:col-span-2">
-                    <label className="flex flex-col gap-1 text-sm text-secondary-700">
+                    <label className="flex flex-col gap-1 text-xs font-semibold uppercase tracking-[0.12em] text-stone">
                       <span>3-Day Rent Fee</span>
                       <input
                         type="number"
                         value={editForm.price}
                         onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
                         placeholder="3-Day fee"
-                        className="p-2 border border-secondary-200 rounded-lg"
+                        className="bg-paper px-3 py-2.5 border border-ink/10 rounded-lg text-ink focus:outline-none focus:border-wine focus:ring-1 focus:ring-wine"
                       />
                     </label>
-                    <label className="flex flex-col gap-1 text-sm text-secondary-700">
-                      <span>Add'l Day Rate</span>
+                    <label className="flex flex-col gap-1 text-xs font-semibold uppercase tracking-[0.12em] text-stone">
+                      <span>Add&apos;l Day Rate</span>
                       <input
                         type="number"
                         value={editForm.additionalDayPrice}
                         onChange={(e) => setEditForm({ ...editForm, additionalDayPrice: e.target.value })}
                         placeholder="Add'l day"
-                        className="p-2 border border-secondary-200 rounded-lg"
+                        className="bg-paper px-3 py-2.5 border border-ink/10 rounded-lg text-ink focus:outline-none focus:border-wine focus:ring-1 focus:ring-wine"
                       />
                     </label>
                   </div>
-                  <input value={editForm.sizeText} onChange={(e) => setEditForm({ ...editForm, sizeText: e.target.value })} placeholder="Sizes: XS, S, M" className="md:col-span-2 p-2 border border-secondary-200 rounded-lg" />
-                  <label className="md:col-span-2 flex items-center gap-2 p-2 border border-secondary-200 rounded-lg bg-white text-sm text-secondary-600 cursor-pointer">
+                  <input value={editForm.sizeText} onChange={(e) => setEditForm({ ...editForm, sizeText: e.target.value })} placeholder="Sizes: XS, S, M" className="md:col-span-2 bg-paper px-3 py-2.5 border border-ink/10 rounded-lg text-ink placeholder:text-stone/70 focus:outline-none focus:border-wine focus:ring-1 focus:ring-wine" />
+                  <label className="md:col-span-2 flex items-center gap-2 px-3 py-2.5 border border-ink/10 rounded-lg bg-paper text-sm text-stone cursor-pointer">
                     <Upload className="w-4 h-4" />
                     {imageUploading ? "Uploading images..." : "Upload dress photos"}
                     <input
@@ -746,7 +746,7 @@ export default function AdminPage() {
                       ))}
                     </div>
                   )}
-                  <textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} placeholder="Description" className="md:col-span-2 p-2 border border-secondary-200 rounded-lg min-h-[80px]" />
+                  <textarea value={editForm.description} onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} placeholder="Description" className="md:col-span-2 bg-paper px-3 py-2.5 border border-ink/10 rounded-lg text-ink placeholder:text-stone/70 focus:outline-none focus:border-wine focus:ring-1 focus:ring-wine min-h-[110px]" />
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
@@ -760,7 +760,7 @@ export default function AdminPage() {
                     </label>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <button onClick={saveDressEdits} disabled={imageUploading} className="inline-flex items-center gap-1 px-3 py-2 bg-wine text-paper rounded-lg text-sm font-medium hover:bg-wine-soft disabled:opacity-50"> <Save className="w-4 h-4" /> Save Dress </button>
+                    <button onClick={saveDressEdits} disabled={imageUploading} className="inline-flex items-center gap-1 px-4 py-2.5 bg-wine text-paper rounded-lg text-sm font-semibold hover:bg-wine-soft disabled:opacity-50"> <Save className="w-4 h-4" /> Save Dress </button>
                     <button onClick={cancelEditDress} className="inline-flex items-center gap-1 px-3 py-2 bg-secondary-200 text-secondary-700 rounded-lg text-sm font-medium hover:bg-secondary-300"> <X className="w-4 h-4" /> Cancel </button>
                   </div>
                 </div>
